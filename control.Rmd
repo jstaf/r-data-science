@@ -242,3 +242,7 @@ apply(mat, 1, sum)
 apply(mat, 2, sum)
 ```
 
+```{r, echo=FALSE}
+footer()
+```
+

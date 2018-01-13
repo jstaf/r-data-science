@@ -26,8 +26,4 @@ output:
     theme: flatly
     toc: yes
     toc_float: yes
-    include:
-      after_body: footer.Rmd
-    lib_dir: site_libs
-    self_contained: no
 

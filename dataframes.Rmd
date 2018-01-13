@@ -184,3 +184,7 @@ even_newer_cats <- read_csv('cats.csv')
 class(even_newer_cats$coat)
 ```
 
+```{r, echo=FALSE}
+footer()
+```
+

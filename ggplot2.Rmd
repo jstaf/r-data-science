@@ -304,3 +304,7 @@ ggplot(gapminder, aes(x=year, y=lifeExp, group=year)) + geom_boxplot() +
 
 For some additional themes, check out the [`ggthemes` package](https://github.com/jrnold/ggthemes).
 
+```{r, echo=FALSE}
+footer()
+```
+

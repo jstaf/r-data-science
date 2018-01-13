@@ -481,3 +481,7 @@ exercise("Writing output",
          You can use `?write_csv()` to look up how to use this function."))
 ```
 
+```{r, echo=FALSE}
+footer()
+```
+

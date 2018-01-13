@@ -281,5 +281,7 @@ exercise("Converting data types",
 )
 ```
 
-<a href="dataframes.html">Working with dataframes</a>
+```{r, echo=FALSE}
+footer()
+```
 

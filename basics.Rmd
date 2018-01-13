@@ -160,3 +160,7 @@ However, as soon as you modify *anything* in the new variable,
 R will create a new copy."))
 ```
 
+```{r, echo=FALSE}
+footer()
+```
+
