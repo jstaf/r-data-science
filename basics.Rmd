@@ -1,0 +1,162 @@
+---
+title: Coding in R
+---
+
+```{r, include=FALSE}
+source('includes.R')
+```
+
+## Basic syntax
+
+The most basic use of R is as a simple calculator:
+```{r}
+5 + 4
+1 - 3
+4 * -2
+5 / 6
+```
+
+A function in R follows the syntax `function_name(argument1, argument2)`.
+Functions perform operations on their arguments and return a result.
+The most basic function is the `print()` statement.
+
+```{r}
+print('hello world!')
+```
+
+R also gives us access to more complex mathematical funtions.
+For instance, `log()` gives us the natural log of a number, 
+and `exp()` does the inverse. 
+
+```{r}
+log(10)
+exp(log(10))
+```
+
+## Getting help
+
+But do we know all of this just from the top of our head?
+Of course not, there's lots of useful documentation to leaf through.
+Importantly, you'll never stop looking through the docs - it's a fact of life.
+We can look up what a function does by prefixing it with an `?` or hovering 
+over it with our cursor in RStudio and pressing `F1`.
+
+```{r eval=FALSE}
+?log()
+```
+```
+log                    package:base                    R Documentation
+
+Logarithms and Exponentials
+
+Description:
+
+     'log' computes logarithms, by default natural logarithms, 'log10'
+     computes common (i.e., base 10) logarithms, and 'log2' computes
+     binary (i.e., base 2) logarithms.  The general form 'log(x, base)'
+     computes logarithms with base 'base'.
+
+     'log1p(x)' computes log(1+x) accurately also for |x| << 1.
+
+     'exp' computes the exponential function.
+
+     'expm1(x)' computes exp(x) - 1 accurately also for |x| << 1.
+
+Usage:
+
+     log(x, base = exp(1))
+     logb(x, base = exp(1))
+     log10(x)
+     log2(x)
+     
+# further output omitted for brevity
+```
+
+Importantly, the bottom of the help pages always contain executable examples.
+You can *always* copy and paste them into your R console and they will work.
+(A package won't build properly if the examples don't work!)
+So now that we know where to go for help, 
+we know all we need to know about R, right? ;)
+
+## Variables and assignment
+
+We'll probably want to save our answers at some point.
+We do this by assigning a variable.
+A variable is a name for a saved piece of data - let's show some examples:
+
+Assign the value 5 to the variable "a":
+```{r}
+a <- 5
+a
+```
+
+Note that `a` and it's value can be used interchangeably:
+
+```{r}
+a * 7
+```
+
+You may have noticed that we used the `<-` sign to assign a variable earlier.
+This is different than most languages, which use the `=` sign.
+We can actually still use the `=` for assignment in R if we want to.
+
+```{r}
+b = 10
+b
+```
+
+Note that using `=` is frowned upon in R.
+You'll hear that phrase a lot in this lesson... "such and such is frowned upon", 
+"so and so is better".
+Over the course of this lesson, we're going to actually try to explain why 
+we do things each way.
+In this particular case, both methods are the same in all but one rarely-used
+edge case (inline variable assignment). 
+As such, you are free to use whichever operator you choose, but by convention,
+R programmers will typically use `<-` (RStudio hotkey: `Alt + -`). 
+If you're interested in doing things according to the "official style", you can
+open up Tools -> Global Options -> Code -> Diagnostics 
+and tell it to check code style.
+
+One important thing to note is when variables are modified.
+Let's demonstrate this via example.
+
+```{r}
+weight_kg <- 55
+weight_lb <- weight_kg * 2.2
+weight_lb
+```
+
+Ok, everyone should be with me so far. 
+But what about if we modify the value of `weight_kg`, 
+does `weight_lb` change as well?
+
+```{r}
+weight_kg <- 9000
+weight_lb
+```
+
+It does not. Variables only update when we explicitly assign them with `<-`.
+
+```{r}
+weight_lb <- weight_kg * 2.2
+weight_lb
+```
+
+We can contrast with how variable assignment works in Python and other languages:
+where there is a distinction between objects and primitives
+and assigning a new copy of an object just creates a link to the original set
+of data. R does not treat any variables differently from others.
+In R, whenever you assign a variable under a new name, 
+it creates a copy of the orignal.
+
+```{r, echo=FALSE}
+note("Copy-on-modify",
+     p("
+Or, that's almost how it works. R uses a \"copy-on-modify\" behavior.
+Essentially whenever you assign a variable under a new name,
+it points at the old variable, and does not take up any extra space.
+However, as soon as you modify *anything* in the new variable, 
+R will create a new copy."))
+```
+

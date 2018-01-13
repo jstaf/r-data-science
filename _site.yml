@@ -1,0 +1,33 @@
+name: Data Science with R
+navbar:
+  title: Data Science with R
+  right:
+  - text: Home
+    href: index.html
+  - text: Sections
+    menu:
+    - text: Basic syntax
+      href: basics.html
+    - text: Vectors and indexing
+      href: vectors.html
+    - text: Dataframes
+      href: dataframes.html
+    - text: Data analysis with dplyr
+      href: dplyr.html
+    - text: Writing functions
+      href: control.html
+    - text: Pretty plots with ggplot2
+      href: ggplot2.html
+    - text: Reports with R Markdown
+      href: rmarkdown.html
+output_dir: docs
+output:
+  html_document:
+    theme: flatly
+    toc: yes
+    toc_float: yes
+    include:
+      after_body: footer.Rmd
+    lib_dir: site_libs
+    self_contained: no
+

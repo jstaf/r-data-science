@@ -1,0 +1,483 @@
+---
+title: "Data analysis with dplyr"
+---
+
+```{r, include=FALSE}
+source("includes.R")
+```
+
+## About the rest of this tutorial
+
+There are a million different ways to do things in R.
+This isn't Python, where solutions on StackOverflow get ranked on how "Pythonic" they are.
+If there's something you like about another workflow in R, 
+there's nothing stopping you from using it!
+
+In this case, there are three main camps on analyzing dataframes in R:
+
+* **"Base R"** - 
+  "Base R" means using only functions and stuff built into your base R installation.
+  No external packages or fancy stuff. 
+  The focus here is on stability from version to version - 
+  your code will never break from an update, 
+  but performance and usability aren't always as great.
+
+* **`data.table`** - 
+  `data.table` is a dataframe manipulation package known to have very good performance.
+
+* **"The tidyverse"** -
+  The "tidyverse" is a collection of packages that 
+  overhauls just about everything in R to use a consistent API.
+  Has comparable performance with `data.table`.
+
+For much of the rest of this tutorial,
+we'll focus on doing things the "tidyverse" way (with a few exceptions).
+The biggest reasons is that everything follows a consistent API -
+everything in the tidyverse works well together. 
+You can often guess how to use a new function because you've used others like it.
+It's also got pretty great performance.
+When you use stuff from the tidyverse, you can be reasonably confident
+that someone has already taken a look at optimizing things to speed things along.
+
+## Logical indexing
+
+So far, we've covered how to extract certain pieces of data via indexing.
+But what we've shown so far only works if we know the exact index
+of the data we want (`vector[42]`, for example).
+There is a neat trick to extra certain pieces of data in R known as "logical indexing".
+
+Before we start, we need to know a little about comparing things.
+
+`==` is the equality operator in R.
+
+```{r}
+1 == 1
+```
+
+`!` means "not".
+Not `TRUE` is `FALSE`.
+
+```{r}
+!TRUE
+```
+
+Likewise we can check if something is not equal to something else with `!=`
+
+```{r}
+TRUE != TRUE
+```
+
+We can also make comparisons with the greater than `>` and less than `<` symbols. 
+Pairing these with an equals sign means "greater than or equal to" (`>=`) 
+or "less than or equal to" (`<=`).
+
+```{r}
+4 < 5
+5 <= 5
+9 > 999
+TRUE >= FALSE
+```
+
+The last example worked because `TRUE` and `FALSE` are equal to 1 and 0, respectively.
+
+```{r}
+TRUE == 1
+FALSE == 1
+```
+
+We can even compare strings:
+
+```{r}
+"a" == "a"
+"a" != "b"
+```
+
+This trick also works with vectors, returning `TRUE` or `FALSE` 
+for every element in the vector.
+
+```{r}
+example <- 1:7
+example >= 4
+another_example <- c("apple", "banana", "banana")
+another_example == "banana"
+```
+
+This trick is ***extremely useful*** for getting specific elements.
+Watch what happens when we index a vector using a set of boolean values.
+Using our example from above:
+
+```{r}
+example
+greater_than_3 <- example > 3
+greater_than_3
+example[greater_than_3]
+```
+
+This can be turned into a one-liner by putting the boolean expression inside
+the square brackets.
+
+```{r}
+example[example > 3]
+```
+
+We can also get the elements which were not greater than 3 by adding an `!`
+in front.
+
+```{r}
+example[!example > 3]
+```
+
+```{r, echo=FALSE}
+exercise("Removing NAs from a dataset",
+    p("Logical indexing is also a pretty neat trick for removing NAs from a vector.
+      Many functions will refuse to work on data with NAs present.
+      The is.na() function returns TRUE or FALSE depending on if a value is NA."),
+    p("Using this info, make the following return a number as a result instead of NA:"),
+    pre("
+ugly_data <- c(1, NA, 5, 7, NA, NA)
+mean(ugly_data)
+")
+)
+
+exercise('The "na.rm" argument', 
+         p('Many functions have an "na.rm" argument used to ignore NA values.
+           Does this work for mean() in the previous example?'))
+```
+
+## Retrieving rows from dataframes
+
+Let's try this out on a bigger dataset.
+`nycflights13` is an example dataset containing 
+all outbound flights from NYC in 2013.
+You can get this dataset with `install.packages("nycflights13")`.
+
+Let's take a look at the dataset and see what we've got.
+
+```{r}
+library(nycflights13)
+head(flights)  # shows the top few rows of a dataset
+str(flights)
+dim(flights)
+```
+
+```{r, echo=FALSE}
+note("A note about tbl_dfs",
+     p('"flights" is an example of a "tibble" or "tbl_df".
+       tbl_dfs are identical to dataframes for most purposes,
+       but they print out differently (notice how we didnt\'t get all of the columns!).'),
+     pre("class(flights)"),
+     pre('## [1] "tbl_df"     "tbl"        "data.frame"'),
+     p("To force a `tbl_df` to print all columns, you can use `print(some_tbl_df, width=Inf)`"),
+     p("If we ever get annoyed with a `tbl_df`, 
+       we can turn it back into a dataframe with `as.data.frame()`."),
+    pre("class(as.data.frame(flights))"),
+    pre('## [1] "data.frame"')
+)
+```
+
+The `flights` table clocks in at several hundred thousand rows.
+That's a fair sized chunk of data.
+Nevertheless, our tricks from before work just the same.
+
+Using the same technique from before, 
+let's retrieve all of the flights that went to Los Angeles (LAX).
+
+```{r}
+rows_with_yvr <- flights$dest == "LAX"
+flights[rows_with_yvr, ]
+# and the same, but in one line
+result <- flights[flights$dest == "LAX", ]
+# checking our work... we should only see "LAX" here
+unique(result$dest)
+# how many results did we get
+nrow(result)
+```
+
+Breaking things apart, we look for all instances where the column
+`dest` was equal to "LAX".
+We end up with a vector of whether or not "LAX" was found in each row.
+We can then use the square brackets to extract every row where the vector is true.
+Note the addition of a comma in our square brackets.
+`flights` has 2 dimensions, so our indexing needs to as well!
+
+If we don't add the comma, R gets upset:
+```{r eval=FALSE}
+flights[flights$dest]
+```
+```
+Error: Length of logical index vector must be 1 or 19 (the number of rows), not 336776
+```
+
+One other issue - what happens if we want to grab the flights to either LAX or SEA (Seattle).
+Let's try the following:
+
+```{r}
+result <- flights[flights$dest == c("LAX", "SEA"), ]
+unique(result$dest)
+nrow(result)
+```
+
+Though in both cases we got results corresponding to the cities we wanted, 
+it looks like somethig went wrong.
+Before, we got 16174 results for just "LAX".
+Now we only get 10060, and we even added an extra city worth of flights!
+So what's happening here? 
+
+When R compares two vectors of different length, 
+it "recycles" the shorter vector until it matches
+the length of the longer one!
+
+Using a smaller example, this is what just happened:
+
+```{r}
+long <- c(1, 1, 1, 2, 2, 2, 3)
+short <- c(1, 2)
+long == short
+
+# what R is really doing behind the scenes
+short_recycled <- c(1, 2, 1, 2, 1, 2, 1)
+long == short_recycled
+```
+
+This is not what we want.
+We want to know if elements in the long vector were found "in"
+the shorter vector,
+not whether or not the two are equal at every point.
+Fortunately, there is a special `%in%` operator that does just that.
+
+```{r}
+long %in% short
+# and using that to subset values
+long[long %in% short]
+```
+
+If we take the `%in%` operator and apply it to our issue, we get the correct number of rows.
+
+```{r}
+res <- flights[flights$dest %in% c("SEA", "LAX"), ]
+nrow(res)
+
+# our results contain the same number of flights bound for LAX
+nrow(res[flights$dest == "LAX", ])
+```
+
+## Filtering rows with `dplyr`
+
+Up to this point, we've done everything using base R.
+Our code has a lot of crazy symbols in it, 
+and isn't that readable for the average person.
+It's also not that fun to type out.
+
+Let's try things the "tidyverse" way using `dplyr`
+(`dplyr` is a package that comes as part of the `tidyverse` package bundle).
+
+To filter out a set of specific rows that match a condition,
+we use the `filter()` function.
+The syntax of this function is a bit unusual:
+
+```{r}
+library(tidyverse)
+results <- filter(flights, dest == "LAX")
+nrow(results)
+```
+
+Notice how we just used `dest` all by itself.
+`filter()` is smart enough to figure out that `dest` is a column name in the `flights` dataframe.
+
+We can also filter multiple things at once using the `&` (AND) and `|` (OR) operators.
+`&` checks if both conditions are true,
+`|` checks if just one condition is true:
+
+```{r}
+TRUE & TRUE
+TRUE & FALSE
+TRUE | FALSE
+```
+
+Using this in an example with `filter()` to fetch
+all the flights to LAX in February:
+
+```{r}
+filter(flights, dest == "LAX" & month == 2)
+```
+
+```{r, echo=FALSE}
+exercise("Filtering data",
+         p("Let's do several more examples to make sure you're super comfortable with filtering data:"),
+         ul(
+            li("How many flights left before 6 AM?"),
+            li("How many flights went to Toronto (YYZ)? Is there anything weird about this dataset?"),
+            li("What is a typical flight time (air time) when traveling from New York to Chicago O'Hare (ORD)?")
+            )
+         )
+```
+
+## Using the "pipe"
+
+The tidyverse heavily encourages the use of a special pipe (`%>%` operator).
+The pipe sends the output of the last command to the first argument of the next
+(probably will be a familiar concept for users of bash, the Linux shell).
+This is a great tool for making our analyses more readable (read: good).
+
+Repeating an earlier example, we can retrieve the number of flights that went to LAX with: 
+
+```{r}
+# earlier example:
+# nrow(filter(flights, dest == "LAX"))
+
+flights %>%	filter(dest == "LAX") %>% nrow
+```
+
+Our analysis now flows from left to right, instead of inside out.
+Makes things quite a bit more readable.
+Many people also put each step on a new line.
+That way if you want to exclude a step, you can just comment it out.
+
+```{r}
+flights %>%
+	filter(dest == "LAX") %>%
+	nrow()
+```
+
+## Controlling output
+
+`dplyr` also has its own function for selecting columns: `select()`.
+To grab the certain columns from a dataframe, 
+we supply their names to `select()` as arguments.
+
+```{r}
+flights %>% select(flight, dest, air_time)
+```
+
+We can also sort columns using `arrange()`.
+`arrange()` sorts a dataset by whatever column names you specify.
+
+```{r}
+flights %>% arrange(sched_dep_time)
+```
+
+To sort in descending order, we can add the `desc()` function into the mix.
+
+```{r}
+flights %>% arrange(desc(sched_dep_time))
+```
+
+## Data analysis
+
+So far we've learned how to to rearrange and select parts of our data.
+What about actually analyzing it.
+The `group_by()` and `summarize()` functions,
+allow us to group by a certain column (say, city or airline),
+and then perform an operation on every group.
+
+A simple example might be grouping by month and then summarizing by 
+the number of flights (rows) in each group.
+
+```{r}
+flights %>%
+	group_by(month) %>%
+	summarize(length(month))  # number of records in a group
+```
+
+We can also perform multiple "summarizations" at once
+and name our columns something informative.
+
+```{r}
+flights %>%
+	group_by(month) %>%
+	summarize(num_flights=length(month),
+			  avg_flight_time=mean(air_time, na.rm=TRUE))
+```
+
+We can also simply add on a column to a dataset with the `mutate()` function.
+This is the equivalent of `cats$age <- c(1, 3, 4)` like we did earlier.
+
+```{r}
+colnames(flights)
+new_flights <- flights %>%
+	mutate(plane_speed = distance / air_time)
+colnames(flights)
+```
+
+```{r, echo=FALSE}
+exercise("Finding the worst airline",
+         p("Which airline has the worst record in terms of delays?"),
+         p("To do this, group our data by carrier, 
+           get the average arrival delay for each group,
+           then sort in descending order so that the worst offenders are at the top."))
+
+exercise("Picking an analysis method",
+          p("Get the maximum arrival delay in the dataset.
+            You'll want to use the `max()` function.
+            Did you need to use `dplyr`?"))
+```
+
+## Putting dataframes together
+
+In terms of some data, the `flights` table is actually incomplete!
+What if we wanted to match up the destination airport acronyms to
+their details (like airports' full names)?
+This data is actually in another table: `airports`.
+
+```{r}
+head(airports)
+```
+
+In order for this information to be useful to us,
+we need to match it up and "join" it to our flights table.
+This is a pretty complex operation in base R, 
+but `dplyr` makes it relatively easy.
+
+There are a lot of different types of joins that put together
+data in different ways.
+In this case, we're going to do what's called a "left join":
+one table is on the left side, and we'll keep all of its data.
+However, on the right side (the table we are joining), 
+we'll only match up and add each entry if there is a corresponding entry on the left side.
+
+```{r}
+colnames(flights)
+colnames(airports)
+
+# join syntax:
+# left_join(left_table, right_table, by=c("left_colname" = "right_colname"))
+# the "by" argument controls which columns in each table are matched up
+joined <- left_join(flights, airports, by=c("dest" = "faa"))
+colnames(joined)  # joined now contain columns from both
+```
+
+Let's check our work.
+SEA should show up as Seattle-Tacoma International Airport.
+Note: we can use `.` as a placeholder to represent the entire object passed to the summarize function
+(instead of using just a column name, for instance).
+
+```{r}
+joined %>%
+	filter(dest == "SEA") %>%
+	select(name) %>%
+	head(n=1)
+```
+
+Looks like our join worked!
+
+```{r, echo=FALSE}
+exercise("Worst airline, part II",
+         p("Find the name of the airline with the biggest arrival delays.
+           You will need to join the `airlines` table to the `flights` table.
+           A suggested workflow is shown below (feel free to reuse code from earlier)."),
+         ul(
+            li("Calculate the average arrival delays by airline."),
+            li("Sort the result by average delay in descending order."),
+            li("Find which columns match up between the `airlines` and `flights` tables.
+                Remember, you can use `print(table_name, width=Inf)` to show all columns!"),
+            li("Join the `airlines` table to the `flights` table based upon their common column."),
+            li("The top value is your answer")
+            )
+)
+
+exercise("Writing output",
+         p("Write your results from the last problem to a file.
+         Use the `write_csv()` to write the table to a csv file.
+         You can use `?write_csv()` to look up how to use this function."))
+```
+

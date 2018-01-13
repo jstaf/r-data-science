@@ -1,0 +1,186 @@
+---
+---
+
+```{r, echo=FALSE}
+source("includes.R")
+```
+
+## Vectors vs. Dataframes
+
+Vectors and matrices are super cool. 
+However they don't address an important issue:
+holding multiple types of data and working with them at the same time.
+Dataframes are another special data structure that let's you
+handle large amounts and different types of data together.
+Because of this, they are generally the tool-of-choice
+for doing analyses in R.
+
+We are going to focus on using dataframes using the `dplyr` package.
+`dplyr` comes as part of the `tidyverse` package bundle, 
+you can install it with `install.packages("tidyverse")`.
+It can take awhile to install this on Linux, 
+so perhaps start the command in another window while we go through the non-dplyr parts.
+
+## A small example
+
+In a text editor, create the following example CSV file.
+We'll call it `cats.csv`.
+
+```
+coat,weight,likes_string
+calico,2.1,1
+black,5.0,0
+tabby,3.2,1
+```
+
+Once we've saved it in the same directory we're working in,
+we can load it with `read.csv()`. 
+
+```{r}
+cats <- read.csv('cats.csv')
+cats
+```
+
+Whenever we import a dataset with multiple types of values,
+R will autodetect this and make the output a dataframe.
+Let's verify this for ourselves:
+
+```{r}
+class(cats)
+```
+
+So, we've got a dataframe with multiple types of values.
+How do we work with it?
+Fortunately, everything we know about vectors also applies to dataframes.
+
+Each column of a dataframe can be used as a vector.
+We use the `$` operator to specify which column we want.
+
+```{r}
+cats$weight + 34
+class(cats$weight)
+cats$coat
+```
+
+We can also reassign columns as if they were variables.
+The `cats$likes_string` likely represents a set of boolean value,
+lets update that column to reflect this fact.
+
+```{r}
+class(cats$likes_string)  # before
+cats$likes_string <- as.logical(cats$likes_string)
+class(cats$likes_string)
+```
+
+We can even add a column if we want!
+
+```{r eval=FALSE}
+cats$age <- c(1, 6, 4, 2.5)
+```
+```
+Error in `$<-.data.frame`(`*tmp*`, age, value = c(1, 6, 4, 2.5)) : 
+  replacement has 4 rows, data has 3
+```
+
+Notice how it won't let us do that.
+The reason is that dataframes must have the same number of elements in every column.
+If each column only has 3 rows, we can't add another column with 4 rows.
+Let's try that again with the proper number of elements.
+
+```{r}
+cats$age <- c(1, 6, 4)
+cats
+```
+
+Note that we don't have to call `class()` on every single column
+to figure out what they are.
+There are a number of useful summary functions to get information about our dataframe.
+
+`str()` reports on the structure of your dataframe. 
+It is an extremely useful function - 
+use it on everything if you've loaded a dataset for the first time.
+
+```{r}
+str(cats)
+```
+
+As with matrices, we can use `dim()` to know how many rows and columns we're working with.
+
+```{r}
+dim(cats)
+nrow(cats)  # number of rows only
+ncol(cats)  # number of columns only
+```
+
+## Factors
+
+When we ran `str(cats)`, you might have noticed something weird.
+`cats$coat` is listed as a "factor". 
+A factor is a special type of data that's *almost* a string.
+
+It prints like a string (sort of):
+
+```{r}
+cats$coat
+```
+
+It can be used like a string:
+
+```{r}
+paste("The cat is", cats$coat)
+```
+
+But it's not a string!
+The output of `str(cats)` gives us a clue to what's actually happening
+behind-the-scenes.
+
+```{r}
+str(cats)
+```
+
+`str()` reports that the first values are 2, 1, 3 (and not text).
+Let's use `as.numeric()` to reveal its true form!
+
+```{r}
+as.numeric(cats$coat)
+cats$coat
+```
+
+A factor has two components, its levels and its values.
+Levels represent all possible values for a column.
+In this case, there's only 3 possiblities:
+`black`, `calico` and `tabby`.
+
+The actual values are 2, 1, and 3.
+Each value matches up to a specific level.
+So in our example, the first value is 2, which corresponds to the second level, `calico`.
+The second value is 1, which matches up with the first level, `black`.
+
+Factors in R are a method of storing text information 
+as one of several possible "levels".
+R converts text to factors automatically when we import data, like from a CSV file.
+We've got several options here:
+
+Convert the factor to a character vector ourselves:
+```{r}
+cats$coat <- as.character(cats$coat)
+class(cats$coat)
+```
+
+Tell R to simply not convert things to factors when we import it
+(`as.is=TRUE` is the R equivalent of "don't touch my stuff!"):
+```{r}
+new_cats <- read.csv('cats.csv', as.is=TRUE)
+class(new_cats$coat)
+```
+
+Use the `read_csv()` function from the `readr` package.
+`readr` is part of the `tidyverse` and has a number of ways of
+reading/writing data with more sensible defaults.
+
+```{r}
+library(tidyverse)
+even_newer_cats <- read_csv('cats.csv')
+class(even_newer_cats$coat)
+```
+
