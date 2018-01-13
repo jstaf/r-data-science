@@ -11,6 +11,6 @@ clean:
 	rm -rf docs/
 
 
-docs/%.html: %.*md includes.R
+docs/%.html: %.*md includes.R _site.yml
 	Rscript -e 'rmarkdown::render_site("$<")'
 

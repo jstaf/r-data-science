@@ -154,14 +154,12 @@ ggplot(gapminder, aes(x=year, y=lifeExp, group=year)) +
     geom_boxplot()
 ```
 
-# Other tricks
 
 You can use R markdown to create HTML reports, Word documents, PDFs,
 and even websites. 
-For instance, this entire lesson was created using R markdown.
-Check this out (and do the exercise):
+For instance, this entire lesson website was created using R markdown.
 
-```{r}
+```{r, echo=FALSE}
 exercise("Writing your own report",
          p("Using any dataset you want, find something interesting and 
            write a report on it in RMarkdown

@@ -23,7 +23,10 @@ navbar:
 output_dir: docs
 output:
   html_document:
-    theme: flatly
+    theme: flatly 
+    css: style.css
     toc: yes
     toc_float: yes
+    include:
+        after_body: footer.html
 

@@ -42,10 +42,14 @@ footer <- function() {
     # determine next page from _site.yml
     site <- yaml.load_file('_site.yml')
     menu <- site$navbar$right[[2]]$menu 
-    menu <- c(map_chr(menu, ~.x$href), "index.html")
-    next_page <- menu[which(menu == target) + 1]
+    menu <- map_chr(menu, ~.x$href)
 
-    # return a big, fat hyperlink
-    return(a(href = next_page, h2("Next section")))
+    # indexing oob, naughty, I know...
+    next_page <- menu[which(menu == target) + 1]
+    if (is.na(next_page)) {
+        return(a(href="index.html", style="font-size:2em;", "Return to frontpage"))
+    } else {
+        return(a(href = next_page, style = "font-size:2em;", "Next section"))
+    }
 }
 
