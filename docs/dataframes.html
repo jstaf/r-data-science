@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title></title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Data Science with R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Sections
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="basics.html">Basic syntax</a>
+    </li>
+    <li>
+      <a href="vectors.html">Vectors and indexing</a>
+    </li>
+    <li>
+      <a href="dataframes.html">Dataframes</a>
+    </li>
+    <li>
+      <a href="dplyr.html">Data analysis with dplyr</a>
+    </li>
+    <li>
+      <a href="control.html">Writing functions</a>
+    </li>
+    <li>
+      <a href="ggplot2.html">Pretty plots with ggplot2</a>
+    </li>
+    <li>
+      <a href="rmarkdown.html">Reports with R Markdown</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+
+</div>
+
+
+<div id="vectors-vs.dataframes" class="section level2">
+<h2>Vectors vs. Dataframes</h2>
+<p>Vectors and matrices are super cool. However they don’t address an important issue: holding multiple types of data and working with them at the same time. Dataframes are another special data structure that let’s you handle large amounts and different types of data together. Because of this, they are generally the tool-of-choice for doing analyses in R.</p>
+<p>We are going to focus on using dataframes using the <code>dplyr</code> package. <code>dplyr</code> comes as part of the <code>tidyverse</code> package bundle, you can install it with <code>install.packages(&quot;tidyverse&quot;)</code>. It can take awhile to install this on Linux, so perhaps start the command in another window while we go through the non-dplyr parts.</p>
+</div>
+<div id="a-small-example" class="section level2">
+<h2>A small example</h2>
+<p>In a text editor, create the following example CSV file. We’ll call it <code>cats.csv</code>.</p>
+<pre><code>coat,weight,likes_string
+calico,2.1,1
+black,5.0,0
+tabby,3.2,1</code></pre>
+<p>Once we’ve saved it in the same directory we’re working in, we can load it with <code>read.csv()</code>.</p>
+<pre class="r"><code>cats &lt;- read.csv(&#39;cats.csv&#39;)
+cats</code></pre>
+<pre><code>##     coat weight likes_string
+## 1 calico    2.1            1
+## 2  black    5.0            0
+## 3  tabby    3.2            1</code></pre>
+<p>Whenever we import a dataset with multiple types of values, R will autodetect this and make the output a dataframe. Let’s verify this for ourselves:</p>
+<pre class="r"><code>class(cats)</code></pre>
+<pre><code>## [1] &quot;data.frame&quot;</code></pre>
+<p>So, we’ve got a dataframe with multiple types of values. How do we work with it? Fortunately, everything we know about vectors also applies to dataframes.</p>
+<p>Each column of a dataframe can be used as a vector. We use the <code>$</code> operator to specify which column we want.</p>
+<pre class="r"><code>cats$weight + 34</code></pre>
+<pre><code>## [1] 36.1 39.0 37.2</code></pre>
+<pre class="r"><code>class(cats$weight)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>cats$coat</code></pre>
+<pre><code>## [1] calico black  tabby 
+## Levels: black calico tabby</code></pre>
+<p>We can also reassign columns as if they were variables. The <code>cats$likes_string</code> likely represents a set of boolean value, lets update that column to reflect this fact.</p>
+<pre class="r"><code>class(cats$likes_string)  # before</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<pre class="r"><code>cats$likes_string &lt;- as.logical(cats$likes_string)
+class(cats$likes_string)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<p>We can even add a column if we want!</p>
+<pre class="r"><code>cats$age &lt;- c(1, 6, 4, 2.5)</code></pre>
+<pre><code>Error in `$&lt;-.data.frame`(`*tmp*`, age, value = c(1, 6, 4, 2.5)) : 
+  replacement has 4 rows, data has 3</code></pre>
+<p>Notice how it won’t let us do that. The reason is that dataframes must have the same number of elements in every column. If each column only has 3 rows, we can’t add another column with 4 rows. Let’s try that again with the proper number of elements.</p>
+<pre class="r"><code>cats$age &lt;- c(1, 6, 4)
+cats</code></pre>
+<pre><code>##     coat weight likes_string age
+## 1 calico    2.1         TRUE   1
+## 2  black    5.0        FALSE   6
+## 3  tabby    3.2         TRUE   4</code></pre>
+<p>Note that we don’t have to call <code>class()</code> on every single column to figure out what they are. There are a number of useful summary functions to get information about our dataframe.</p>
+<p><code>str()</code> reports on the structure of your dataframe. It is an extremely useful function - use it on everything if you’ve loaded a dataset for the first time.</p>
+<pre class="r"><code>str(cats)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    3 obs. of  4 variables:
+##  $ coat        : Factor w/ 3 levels &quot;black&quot;,&quot;calico&quot;,..: 2 1 3
+##  $ weight      : num  2.1 5 3.2
+##  $ likes_string: logi  TRUE FALSE TRUE
+##  $ age         : num  1 6 4</code></pre>
+<p>As with matrices, we can use <code>dim()</code> to know how many rows and columns we’re working with.</p>
+<pre class="r"><code>dim(cats)</code></pre>
+<pre><code>## [1] 3 4</code></pre>
+<pre class="r"><code>nrow(cats)  # number of rows only</code></pre>
+<pre><code>## [1] 3</code></pre>
+<pre class="r"><code>ncol(cats)  # number of columns only</code></pre>
+<pre><code>## [1] 4</code></pre>
+</div>
+<div id="factors" class="section level2">
+<h2>Factors</h2>
+<p>When we ran <code>str(cats)</code>, you might have noticed something weird. <code>cats$coat</code> is listed as a “factor”. A factor is a special type of data that’s <em>almost</em> a string.</p>
+<p>It prints like a string (sort of):</p>
+<pre class="r"><code>cats$coat</code></pre>
+<pre><code>## [1] calico black  tabby 
+## Levels: black calico tabby</code></pre>
+<p>It can be used like a string:</p>
+<pre class="r"><code>paste(&quot;The cat is&quot;, cats$coat)</code></pre>
+<pre><code>## [1] &quot;The cat is calico&quot; &quot;The cat is black&quot;  &quot;The cat is tabby&quot;</code></pre>
+<p>But it’s not a string! The output of <code>str(cats)</code> gives us a clue to what’s actually happening behind-the-scenes.</p>
+<pre class="r"><code>str(cats)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    3 obs. of  4 variables:
+##  $ coat        : Factor w/ 3 levels &quot;black&quot;,&quot;calico&quot;,..: 2 1 3
+##  $ weight      : num  2.1 5 3.2
+##  $ likes_string: logi  TRUE FALSE TRUE
+##  $ age         : num  1 6 4</code></pre>
+<p><code>str()</code> reports that the first values are 2, 1, 3 (and not text). Let’s use <code>as.numeric()</code> to reveal its true form!</p>
+<pre class="r"><code>as.numeric(cats$coat)</code></pre>
+<pre><code>## [1] 2 1 3</code></pre>
+<pre class="r"><code>cats$coat</code></pre>
+<pre><code>## [1] calico black  tabby 
+## Levels: black calico tabby</code></pre>
+<p>A factor has two components, its levels and its values. Levels represent all possible values for a column. In this case, there’s only 3 possiblities: <code>black</code>, <code>calico</code> and <code>tabby</code>.</p>
+<p>The actual values are 2, 1, and 3. Each value matches up to a specific level. So in our example, the first value is 2, which corresponds to the second level, <code>calico</code>. The second value is 1, which matches up with the first level, <code>black</code>.</p>
+<p>Factors in R are a method of storing text information as one of several possible “levels”. R converts text to factors automatically when we import data, like from a CSV file. We’ve got several options here:</p>
+<p>Convert the factor to a character vector ourselves:</p>
+<pre class="r"><code>cats$coat &lt;- as.character(cats$coat)
+class(cats$coat)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>Tell R to simply not convert things to factors when we import it (<code>as.is=TRUE</code> is the R equivalent of “don’t touch my stuff!”):</p>
+<pre class="r"><code>new_cats &lt;- read.csv(&#39;cats.csv&#39;, as.is=TRUE)
+class(new_cats$coat)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<p>Use the <code>read_csv()</code> function from the <code>readr</code> package. <code>readr</code> is part of the <code>tidyverse</code> and has a number of ways of reading/writing data with more sensible defaults.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 2.2.1     ✔ readr   1.1.1
+## ✔ tibble  1.4.1     ✔ dplyr   0.7.4
+## ✔ tidyr   0.7.2     ✔ forcats 0.2.0</code></pre>
+<pre><code>## ── Conflicts ───────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>even_newer_cats &lt;- read_csv(&#39;cats.csv&#39;)</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   coat = col_character(),
+##   weight = col_double(),
+##   likes_string = col_integer()
+## )</code></pre>
+<pre class="r"><code>class(even_newer_cats$coat)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<a href="dplyr.html" style="font-size:2em;">Next section</a>
+</div>
+
+<hr>
+<p text-align="right">&copy; Jeff Stafford // <a href="https://jstaf.github.io/r-data-science/">https://jstaf.github.io/r-data-science/</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

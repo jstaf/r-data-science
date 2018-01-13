@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Writing functions</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Data Science with R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Sections
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="basics.html">Basic syntax</a>
+    </li>
+    <li>
+      <a href="vectors.html">Vectors and indexing</a>
+    </li>
+    <li>
+      <a href="dataframes.html">Dataframes</a>
+    </li>
+    <li>
+      <a href="dplyr.html">Data analysis with dplyr</a>
+    </li>
+    <li>
+      <a href="control.html">Writing functions</a>
+    </li>
+    <li>
+      <a href="ggplot2.html">Pretty plots with ggplot2</a>
+    </li>
+    <li>
+      <a href="rmarkdown.html">Reports with R Markdown</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Writing functions</h1>
+
+</div>
+
+
+<div id="what-makes-a-function" class="section level2">
+<h2>What makes a function?</h2>
+<p>Being able to group by and summarize data is great. But so far all we know how to do is use canned functions - ones that come with base R or one of the packages we’ve covered. We’ll need to write our own functions eventually.</p>
+<p>Functions in R are defined almost the same as variables. The general syntax looks like this:</p>
+<pre><code>name &lt;- function(reqd_arg, optional_arg=42) {
+    # do stuff
+    return(result)
+}</code></pre>
+<p>Let’s create a function that adds two numbers together as an example.</p>
+<pre class="r"><code>adder &lt;- function(num1, num2) {
+    result &lt;- num1 + num2
+    return(result)
+}</code></pre>
+<p>We can now use our function just like any other.</p>
+<pre class="r"><code>adder(5, 6)</code></pre>
+<pre><code>## [1] 11</code></pre>
+<p>We also have the ability to specify optional arguments. Optional arguments are just ones where we’ve given it a default. In this case, we’ll make our <code>adder</code> function just add 10 if a second number is not specified. Notice that we’ve also eliminated saving the <code>results</code> variable and do everything in one line.</p>
+<pre class="r"><code>adder &lt;- function(num1, num2=10) {
+    return(num1 + num2)
+}
+adder(5)</code></pre>
+<pre><code>## [1] 15</code></pre>
+<p><div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Writing our own functions</h3>
+</div>
+<div class="panel-body">
+<p>Write a function that converts feet to meters. 1 foot equals 0.3048 meters.</p>
+</div>
+</div><div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Applying our own functions</h3>
+</div>
+<div class="panel-body">
+<p>The "airports" table from "nycflights13" is using feet for altitude instead of meters. 
+           Add a column (alt_meters) to correct this mistake.
+           You'll need to use your function from the last example.</p>
+</div>
+</div></p>
+</div>
+<div id="conditional-expressions" class="section level2">
+<h2>Conditional expressions</h2>
+<p>Sometimes we need to have functions do things differently if a certain condition is met. For this, we use if/else statements. <code>if</code> executes a block of code if some condition was met.</p>
+<pre class="r"><code>number &lt;- 5
+if (number &gt; 4) {
+    print(&#39;number was greater than 4!&#39;)
+}</code></pre>
+<pre><code>## [1] &quot;number was greater than 4!&quot;</code></pre>
+<p><code>else</code> statements are executed if a statement is not met.</p>
+<pre class="r"><code>number &lt;- 3 
+if (number &gt; 4) {
+    print(&#39;number was greater than 4!&#39;)
+} else {
+    print(&#39;number was not greater than 4&#39;)
+}</code></pre>
+<pre><code>## [1] &quot;number was not greater than 4&quot;</code></pre>
+<p>We can add an <code>else if</code> statemet to check a second condition.</p>
+<pre class="r"><code>number &lt;- 3 
+if (number &gt; 4) {
+    print(&#39;number was greater than 4!&#39;)
+} else if (number == 4) {
+    print(&#39;number was equal to 4&#39;)
+} else {
+    print(&#39;number was not greater than 4&#39;)
+}</code></pre>
+<pre><code>## [1] &quot;number was not greater than 4&quot;</code></pre>
+<p>These else/if statements are useful when writing functions.</p>
+</div>
+<div id="running-functions-on-stuff-besides-dataframes" class="section level2">
+<h2>Running functions on stuff besides dataframes</h2>
+<p>The <code>dplyr</code> package is very cool, but what if we want to perform analyses on stuff besides dataframes (like vectors and matrices!)? We’ll need to use the <code>purrr</code> package (also bundled with <code>tidyverse</code>).</p>
+<p>Though we could use a for loop like this, there is a more efficient way of doing things:</p>
+<pre class="r"><code>for (i in 1:10) {
+    print(i)
+}</code></pre>
+<pre><code>## [1] 1
+## [1] 2
+## [1] 3
+## [1] 4
+## [1] 5
+## [1] 6
+## [1] 7
+## [1] 8
+## [1] 9
+## [1] 10</code></pre>
+<p><code>purrr</code> provides a set of functions to provide map/reduce-style functionality. “Map” means to apply a function to every piece of a dataset. “Reduce” means to calculate some kind of summary statistic on a large group of data.</p>
+<p>Let’s demonstrate with several examples using <code>map()</code>. The function requires two arguments, something to iterate over, and a function to apply to each piece.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 2.2.1     ✔ readr   1.1.1
+## ✔ tibble  1.4.1     ✔ dplyr   0.7.4
+## ✔ tidyr   0.7.2     ✔ forcats 0.2.0</code></pre>
+<pre><code>## ── Conflicts ───────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code># iterate over 1:10, apply sqrt() to each number
+mapped &lt;- map(1:10, sqrt)
+mapped</code></pre>
+<pre><code>## [[1]]
+## [1] 1
+## 
+## [[2]]
+## [1] 1.414214
+## 
+## [[3]]
+## [1] 1.732051
+## 
+## [[4]]
+## [1] 2
+## 
+## [[5]]
+## [1] 2.236068
+## 
+## [[6]]
+## [1] 2.44949
+## 
+## [[7]]
+## [1] 2.645751
+## 
+## [[8]]
+## [1] 2.828427
+## 
+## [[9]]
+## [1] 3
+## 
+## [[10]]
+## [1] 3.162278</code></pre>
+<p>Notice how we get back a weird datastructure as a result. <code>map</code> returns a list by default. Lists are a special datastructure that can contain any type or size of element.</p>
+<pre class="r"><code>example_list &lt;- list(1, &quot;a&quot;, c(5, 9 , 10), TRUE)</code></pre>
+<p>One note on indexing lists: to extract individual elements we need to use two square brackets (<code>[[]]</code>) instead of one (<code>[]</code>). Using single brackets just returns a one-element list.</p>
+<pre class="r"><code>example_list[1]</code></pre>
+<pre><code>## [[1]]
+## [1] 1</code></pre>
+<pre class="r"><code>example_list[[1]]</code></pre>
+<pre><code>## [1] 1</code></pre>
+<div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Retrieving nested values</h3>
+</div>
+<div class="panel-body">
+<p>Retrieve the 10 in "example_list" via indexing.
+           You'll need to use multiple sets of square brackets (and index twice).</p>
+</div>
+</div>
+<p>The advantage of using <code>map()</code> is that it can operate on lists as if it were a vector, which is normally hard to do. In this case, we’ll retrieve what type of data is contained in each element. Just as with other tidyverse functions, we can still use the pipe as well!</p>
+<pre class="r"><code>example_list %&gt;% map(class)</code></pre>
+<pre><code>## [[1]]
+## [1] &quot;numeric&quot;
+## 
+## [[2]]
+## [1] &quot;character&quot;
+## 
+## [[3]]
+## [1] &quot;numeric&quot;
+## 
+## [[4]]
+## [1] &quot;logical&quot;</code></pre>
+<p>However, we usually don’t want a list back as output. There are a number of extra map functions that let us specify what type of output we want.</p>
+<pre class="r"><code># return a numerical vector
+1:10 %&gt;% map_dbl(sqrt)</code></pre>
+<pre><code>##  [1] 1.000000 1.414214 1.732051 2.000000 2.236068 2.449490 2.645751
+##  [8] 2.828427 3.000000 3.162278</code></pre>
+<pre class="r"><code># return a character vector
+1:10 %&gt;% map_chr(sqrt)</code></pre>
+<pre><code>##  [1] &quot;1.000000&quot; &quot;1.414214&quot; &quot;1.732051&quot; &quot;2.000000&quot; &quot;2.236068&quot; &quot;2.449490&quot;
+##  [7] &quot;2.645751&quot; &quot;2.828427&quot; &quot;3.000000&quot; &quot;3.162278&quot;</code></pre>
+<p>Note that <code>purrr</code>’s map functions will complain if you ask to get output where type coercion would result in loss of data. This is a useful feature called type-safety.</p>
+<pre class="r"><code>1:10 %&gt;% map_int(sqrt)</code></pre>
+<pre><code>Error: Can&#39;t coerce element 1 from a double to a integer
+Execution halted</code></pre>
+<p>That error prevents this kind of stuff from happening (without you knowing about it!).</p>
+<pre class="r"><code>as.integer(sqrt(7))</code></pre>
+<pre><code>## [1] 2</code></pre>
+</div>
+<div id="anonymous-lambda-functions" class="section level2">
+<h2>Anonymous (lambda) functions</h2>
+<p>Sometimes it can be a bit of a pain to define a function only to use it once. In these scenarios, we can use what’s called an anonymous function - we never give the function a name, using it immediately.</p>
+<p>Here is an example. In this case we want to get the standard error of the mean (SEM), but it is not already defined in R. We’ll use an anonymous function to define our SEM function in-line.</p>
+<pre class="r"><code>data &lt;- list(1:4, 10:8, 50:60)
+data %&gt;% map(function(var) {
+    return(sd(var) / sqrt(length(var)))
+})</code></pre>
+<pre><code>## [[1]]
+## [1] 0.6454972
+## 
+## [[2]]
+## [1] 0.5773503
+## 
+## [[3]]
+## [1] 1</code></pre>
+<p><code>purrr</code> also provides a shortcut to define an anonymous function. We can use <code>~</code> to replace the <code>function</code> keyword, and <code>.x</code> to replace the variable name. Using this shortcut might look like this:</p>
+<pre class="r"><code>data %&gt;% map(~sd(.x) / sqrt(length(.x)))</code></pre>
+<pre><code>## [[1]]
+## [1] 0.6454972
+## 
+## [[2]]
+## [1] 0.5773503
+## 
+## [[3]]
+## [1] 1</code></pre>
+<div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Iterating through rows of a dataframe</h3>
+</div>
+<div class="panel-body">
+<p>The "starwars" dataset has a list of Star Wars characters.
+           However, some of the columns are a little funny - they are lists!</p>
+<pre>class(starwars$films)</pre>
+<pre>## [1] "list"</pre>
+<p>Use "map_int()" and an anonymous function to determin how many
+           films each character appeared in (from the `starwars$films` column).</p>
+</div>
+</div>
+</div>
+<div id="operating-on-matrices" class="section level2">
+<h2>Operating on matrices</h2>
+<p>When it comes to working with rows/columns of matrices, the base R function <code>apply()</code> function is still superior to everything else.</p>
+<pre class="r"><code>mat &lt;- matrix(1:50, nrow=5, ncol=10)
+# operate on rows with margin=1
+apply(mat, 1, sum)</code></pre>
+<pre><code>## [1] 235 245 255 265 275</code></pre>
+<pre class="r"><code># operate on columns with margin=2
+apply(mat, 2, sum)</code></pre>
+<pre><code>##  [1]  15  40  65  90 115 140 165 190 215 240</code></pre>
+<a href="ggplot2.html" style="font-size:2em;">Next section</a>
+</div>
+
+<hr>
+<p text-align="right">&copy; Jeff Stafford // <a href="https://jstaf.github.io/r-data-science/">https://jstaf.github.io/r-data-science/</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

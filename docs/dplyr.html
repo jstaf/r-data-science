@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Data analysis with dplyr</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Data Science with R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Sections
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="basics.html">Basic syntax</a>
+    </li>
+    <li>
+      <a href="vectors.html">Vectors and indexing</a>
+    </li>
+    <li>
+      <a href="dataframes.html">Dataframes</a>
+    </li>
+    <li>
+      <a href="dplyr.html">Data analysis with dplyr</a>
+    </li>
+    <li>
+      <a href="control.html">Writing functions</a>
+    </li>
+    <li>
+      <a href="ggplot2.html">Pretty plots with ggplot2</a>
+    </li>
+    <li>
+      <a href="rmarkdown.html">Reports with R Markdown</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Data analysis with dplyr</h1>
+
+</div>
+
+
+<div id="about-the-rest-of-this-tutorial" class="section level2">
+<h2>About the rest of this tutorial</h2>
+<p>There are a million different ways to do things in R. This isn’t Python, where solutions on StackOverflow get ranked on how “Pythonic” they are. If there’s something you like about another workflow in R, there’s nothing stopping you from using it!</p>
+<p>In this case, there are three main camps on analyzing dataframes in R:</p>
+<ul>
+<li><p><strong>“Base R”</strong> - “Base R” means using only functions and stuff built into your base R installation. No external packages or fancy stuff. The focus here is on stability from version to version - your code will never break from an update, but performance and usability aren’t always as great.</p></li>
+<li><p><strong><code>data.table</code></strong> - <code>data.table</code> is a dataframe manipulation package known to have very good performance.</p></li>
+<li><p><strong>“The tidyverse”</strong> - The “tidyverse” is a collection of packages that overhauls just about everything in R to use a consistent API. Has comparable performance with <code>data.table</code>.</p></li>
+</ul>
+<p>For much of the rest of this tutorial, we’ll focus on doing things the “tidyverse” way (with a few exceptions). The biggest reasons is that everything follows a consistent API - everything in the tidyverse works well together. You can often guess how to use a new function because you’ve used others like it. It’s also got pretty great performance. When you use stuff from the tidyverse, you can be reasonably confident that someone has already taken a look at optimizing things to speed things along.</p>
+</div>
+<div id="logical-indexing" class="section level2">
+<h2>Logical indexing</h2>
+<p>So far, we’ve covered how to extract certain pieces of data via indexing. But what we’ve shown so far only works if we know the exact index of the data we want (<code>vector[42]</code>, for example). There is a neat trick to extra certain pieces of data in R known as “logical indexing”.</p>
+<p>Before we start, we need to know a little about comparing things.</p>
+<p><code>==</code> is the equality operator in R.</p>
+<pre class="r"><code>1 == 1</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p><code>!</code> means “not”. Not <code>TRUE</code> is <code>FALSE</code>.</p>
+<pre class="r"><code>!TRUE</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>Likewise we can check if something is not equal to something else with <code>!=</code></p>
+<pre class="r"><code>TRUE != TRUE</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>We can also make comparisons with the greater than <code>&gt;</code> and less than <code>&lt;</code> symbols. Pairing these with an equals sign means “greater than or equal to” (<code>&gt;=</code>) or “less than or equal to” (<code>&lt;=</code>).</p>
+<pre class="r"><code>4 &lt; 5</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>5 &lt;= 5</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>9 &gt; 999</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>TRUE &gt;= FALSE</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>The last example worked because <code>TRUE</code> and <code>FALSE</code> are equal to 1 and 0, respectively.</p>
+<pre class="r"><code>TRUE == 1</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>FALSE == 1</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<p>We can even compare strings:</p>
+<pre class="r"><code>&quot;a&quot; == &quot;a&quot;</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>&quot;a&quot; != &quot;b&quot;</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>This trick also works with vectors, returning <code>TRUE</code> or <code>FALSE</code> for every element in the vector.</p>
+<pre class="r"><code>example &lt;- 1:7
+example &gt;= 4</code></pre>
+<pre><code>## [1] FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE</code></pre>
+<pre class="r"><code>another_example &lt;- c(&quot;apple&quot;, &quot;banana&quot;, &quot;banana&quot;)
+another_example == &quot;banana&quot;</code></pre>
+<pre><code>## [1] FALSE  TRUE  TRUE</code></pre>
+<p>This trick is <strong><em>extremely useful</em></strong> for getting specific elements. Watch what happens when we index a vector using a set of boolean values. Using our example from above:</p>
+<pre class="r"><code>example</code></pre>
+<pre><code>## [1] 1 2 3 4 5 6 7</code></pre>
+<pre class="r"><code>greater_than_3 &lt;- example &gt; 3
+greater_than_3</code></pre>
+<pre><code>## [1] FALSE FALSE FALSE  TRUE  TRUE  TRUE  TRUE</code></pre>
+<pre class="r"><code>example[greater_than_3]</code></pre>
+<pre><code>## [1] 4 5 6 7</code></pre>
+<p>This can be turned into a one-liner by putting the boolean expression inside the square brackets.</p>
+<pre class="r"><code>example[example &gt; 3]</code></pre>
+<pre><code>## [1] 4 5 6 7</code></pre>
+<p>We can also get the elements which were not greater than 3 by adding an <code>!</code> in front.</p>
+<pre class="r"><code>example[!example &gt; 3]</code></pre>
+<pre><code>## [1] 1 2 3</code></pre>
+<p><div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Removing NAs from a dataset</h3>
+</div>
+<div class="panel-body">
+<p>Logical indexing is also a pretty neat trick for removing NAs from a vector.
+      Many functions will refuse to work on data with NAs present.
+      The is.na() function returns TRUE or FALSE depending on if a value is NA.</p>
+<p>Using this info, make the following return a number as a result instead of NA:</p>
+<pre>
+ugly_data &lt;- c(1, NA, 5, 7, NA, NA)
+mean(ugly_data)
+</pre>
+</div>
+</div><div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - The "na.rm" argument</h3>
+</div>
+<div class="panel-body">
+<p>Many functions have an "na.rm" argument used to ignore NA values.
+           Does this work for mean() in the previous example?</p>
+</div>
+</div></p>
+</div>
+<div id="retrieving-rows-from-dataframes" class="section level2">
+<h2>Retrieving rows from dataframes</h2>
+<p>Let’s try this out on a bigger dataset. <code>nycflights13</code> is an example dataset containing all outbound flights from NYC in 2013. You can get this dataset with <code>install.packages(&quot;nycflights13&quot;)</code>.</p>
+<p>Let’s take a look at the dataset and see what we’ve got.</p>
+<pre class="r"><code>library(nycflights13)
+head(flights)  # shows the top few rows of a dataset</code></pre>
+<pre><code>## # A tibble: 6 x 19
+##    year month   day dep_t… sche… dep_… arr_… sche… arr_… carr… flig… tail…
+##   &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt;
+## 1  2013     1     1    517   515  2.00   830   819  11.0 UA     1545 N142…
+## 2  2013     1     1    533   529  4.00   850   830  20.0 UA     1714 N242…
+## 3  2013     1     1    542   540  2.00   923   850  33.0 AA     1141 N619…
+## 4  2013     1     1    544   545 -1.00  1004  1022 -18.0 B6      725 N804…
+## 5  2013     1     1    554   600 -6.00   812   837 -25.0 DL      461 N668…
+## 6  2013     1     1    554   558 -4.00   740   728  12.0 UA     1696 N394…
+## # ... with 7 more variables: origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;,
+## #   distance &lt;dbl&gt;, hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
+<pre class="r"><code>str(flights)</code></pre>
+<pre><code>## Classes &#39;tbl_df&#39;, &#39;tbl&#39; and &#39;data.frame&#39;:    336776 obs. of  19 variables:
+##  $ year          : int  2013 2013 2013 2013 2013 2013 2013 2013 2013 2013 ...
+##  $ month         : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ day           : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ dep_time      : int  517 533 542 544 554 554 555 557 557 558 ...
+##  $ sched_dep_time: int  515 529 540 545 600 558 600 600 600 600 ...
+##  $ dep_delay     : num  2 4 2 -1 -6 -4 -5 -3 -3 -2 ...
+##  $ arr_time      : int  830 850 923 1004 812 740 913 709 838 753 ...
+##  $ sched_arr_time: int  819 830 850 1022 837 728 854 723 846 745 ...
+##  $ arr_delay     : num  11 20 33 -18 -25 12 19 -14 -8 8 ...
+##  $ carrier       : chr  &quot;UA&quot; &quot;UA&quot; &quot;AA&quot; &quot;B6&quot; ...
+##  $ flight        : int  1545 1714 1141 725 461 1696 507 5708 79 301 ...
+##  $ tailnum       : chr  &quot;N14228&quot; &quot;N24211&quot; &quot;N619AA&quot; &quot;N804JB&quot; ...
+##  $ origin        : chr  &quot;EWR&quot; &quot;LGA&quot; &quot;JFK&quot; &quot;JFK&quot; ...
+##  $ dest          : chr  &quot;IAH&quot; &quot;IAH&quot; &quot;MIA&quot; &quot;BQN&quot; ...
+##  $ air_time      : num  227 227 160 183 116 150 158 53 140 138 ...
+##  $ distance      : num  1400 1416 1089 1576 762 ...
+##  $ hour          : num  5 5 5 5 6 5 6 6 6 6 ...
+##  $ minute        : num  15 29 40 45 0 58 0 0 0 0 ...
+##  $ time_hour     : POSIXct, format: &quot;2013-01-01 05:00:00&quot; &quot;2013-01-01 05:00:00&quot; ...</code></pre>
+<pre class="r"><code>dim(flights)</code></pre>
+<pre><code>## [1] 336776     19</code></pre>
+<div class="panel panel-primary">
+<div class="panel-heading">
+<h3 class="panel-title">A note about tbl_dfs</h3>
+</div>
+<div class="panel-body">
+<p>"flights" is an example of a "tibble" or "tbl_df".
+       tbl_dfs are identical to dataframes for most purposes,
+       but they print out differently (notice how we didnt't get all of the columns!).</p>
+<pre>class(flights)</pre>
+<pre>## [1] "tbl_df"     "tbl"        "data.frame"</pre>
+<p>To force a `tbl_df` to print all columns, you can use `print(some_tbl_df, width=Inf)`</p>
+<p>If we ever get annoyed with a `tbl_df`, 
+       we can turn it back into a dataframe with `as.data.frame()`.</p>
+<pre>class(as.data.frame(flights))</pre>
+<pre>## [1] "data.frame"</pre>
+</div>
+</div>
+<p>The <code>flights</code> table clocks in at several hundred thousand rows. That’s a fair sized chunk of data. Nevertheless, our tricks from before work just the same.</p>
+<p>Using the same technique from before, let’s retrieve all of the flights that went to Los Angeles (LAX).</p>
+<pre class="r"><code>rows_with_yvr &lt;- flights$dest == &quot;LAX&quot;
+flights[rows_with_yvr, ]</code></pre>
+<pre><code>## # A tibble: 16,174 x 19
+##     year month   day dep_t… sched_… dep_d… arr_… sched… arr_d… carr… flig…
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;int&gt;  &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;int&gt;
+##  1  2013     1     1    558     600 - 2.00   924    917   7.00 UA      194
+##  2  2013     1     1    628     630 - 2.00  1016    947  29.0  UA     1665
+##  3  2013     1     1    658     700 - 2.00  1027   1025   2.00 VX      399
+##  4  2013     1     1    702     700   2.00  1058   1014  44.0  B6      671
+##  5  2013     1     1    743     730  13.0   1107   1100   7.00 AA       33
+##  6  2013     1     1    828     823   5.00  1150   1143   7.00 UA     1506
+##  7  2013     1     1    829     830 - 1.00  1152   1200 - 8.00 UA      443
+##  8  2013     1     1    856     900 - 4.00  1226   1220   6.00 AA        1
+##  9  2013     1     1    859     900 - 1.00  1223   1225 - 2.00 VX      407
+## 10  2013     1     1    921     900  21.0   1237   1227  10.0  DL      120
+## # ... with 16,164 more rows, and 8 more variables: tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
+<pre class="r"><code># and the same, but in one line
+result &lt;- flights[flights$dest == &quot;LAX&quot;, ]
+# checking our work... we should only see &quot;LAX&quot; here
+unique(result$dest)</code></pre>
+<pre><code>## [1] &quot;LAX&quot;</code></pre>
+<pre class="r"><code># how many results did we get
+nrow(result)</code></pre>
+<pre><code>## [1] 16174</code></pre>
+<p>Breaking things apart, we look for all instances where the column <code>dest</code> was equal to “LAX”. We end up with a vector of whether or not “LAX” was found in each row. We can then use the square brackets to extract every row where the vector is true. Note the addition of a comma in our square brackets. <code>flights</code> has 2 dimensions, so our indexing needs to as well!</p>
+<p>If we don’t add the comma, R gets upset:</p>
+<pre class="r"><code>flights[flights$dest]</code></pre>
+<pre><code>Error: Length of logical index vector must be 1 or 19 (the number of rows), not 336776</code></pre>
+<p>One other issue - what happens if we want to grab the flights to either LAX or SEA (Seattle). Let’s try the following:</p>
+<pre class="r"><code>result &lt;- flights[flights$dest == c(&quot;LAX&quot;, &quot;SEA&quot;), ]
+unique(result$dest)</code></pre>
+<pre><code>## [1] &quot;LAX&quot; &quot;SEA&quot;</code></pre>
+<pre class="r"><code>nrow(result)</code></pre>
+<pre><code>## [1] 10060</code></pre>
+<p>Though in both cases we got results corresponding to the cities we wanted, it looks like somethig went wrong. Before, we got 16174 results for just “LAX”. Now we only get 10060, and we even added an extra city worth of flights! So what’s happening here?</p>
+<p>When R compares two vectors of different length, it “recycles” the shorter vector until it matches the length of the longer one!</p>
+<p>Using a smaller example, this is what just happened:</p>
+<pre class="r"><code>long &lt;- c(1, 1, 1, 2, 2, 2, 3)
+short &lt;- c(1, 2)
+long == short</code></pre>
+<pre><code>## Warning in long == short: longer object length is not a multiple of shorter
+## object length</code></pre>
+<pre><code>## [1]  TRUE FALSE  TRUE  TRUE FALSE  TRUE FALSE</code></pre>
+<pre class="r"><code># what R is really doing behind the scenes
+short_recycled &lt;- c(1, 2, 1, 2, 1, 2, 1)
+long == short_recycled</code></pre>
+<pre><code>## [1]  TRUE FALSE  TRUE  TRUE FALSE  TRUE FALSE</code></pre>
+<p>This is not what we want. We want to know if elements in the long vector were found “in” the shorter vector, not whether or not the two are equal at every point. Fortunately, there is a special <code>%in%</code> operator that does just that.</p>
+<pre class="r"><code>long %in% short</code></pre>
+<pre><code>## [1]  TRUE  TRUE  TRUE  TRUE  TRUE  TRUE FALSE</code></pre>
+<pre class="r"><code># and using that to subset values
+long[long %in% short]</code></pre>
+<pre><code>## [1] 1 1 1 2 2 2</code></pre>
+<p>If we take the <code>%in%</code> operator and apply it to our issue, we get the correct number of rows.</p>
+<pre class="r"><code>res &lt;- flights[flights$dest %in% c(&quot;SEA&quot;, &quot;LAX&quot;), ]
+nrow(res)</code></pre>
+<pre><code>## [1] 20097</code></pre>
+<pre class="r"><code># our results contain the same number of flights bound for LAX
+nrow(res[flights$dest == &quot;LAX&quot;, ])</code></pre>
+<pre><code>## Warning: Length of logical index must be 1 or 20097, not 336776</code></pre>
+<pre><code>## [1] 16174</code></pre>
+</div>
+<div id="filtering-rows-with-dplyr" class="section level2">
+<h2>Filtering rows with <code>dplyr</code></h2>
+<p>Up to this point, we’ve done everything using base R. Our code has a lot of crazy symbols in it, and isn’t that readable for the average person. It’s also not that fun to type out.</p>
+<p>Let’s try things the “tidyverse” way using <code>dplyr</code> (<code>dplyr</code> is a package that comes as part of the <code>tidyverse</code> package bundle).</p>
+<p>To filter out a set of specific rows that match a condition, we use the <code>filter()</code> function. The syntax of this function is a bit unusual:</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ────────────────────────────────── tidyverse 1.2.1 ──</code></pre>
+<pre><code>## ✔ ggplot2 2.2.1     ✔ readr   1.1.1
+## ✔ tibble  1.4.1     ✔ dplyr   0.7.4
+## ✔ tidyr   0.7.2     ✔ forcats 0.2.0</code></pre>
+<pre><code>## ── Conflicts ───────────────────────────────────── tidyverse_conflicts() ──
+## ✖ dplyr::filter() masks stats::filter()
+## ✖ dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>results &lt;- filter(flights, dest == &quot;LAX&quot;)
+nrow(results)</code></pre>
+<pre><code>## [1] 16174</code></pre>
+<p>Notice how we just used <code>dest</code> all by itself. <code>filter()</code> is smart enough to figure out that <code>dest</code> is a column name in the <code>flights</code> dataframe.</p>
+<p>We can also filter multiple things at once using the <code>&amp;</code> (AND) and <code>|</code> (OR) operators. <code>&amp;</code> checks if both conditions are true, <code>|</code> checks if just one condition is true:</p>
+<pre class="r"><code>TRUE &amp; TRUE</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>TRUE &amp; FALSE</code></pre>
+<pre><code>## [1] FALSE</code></pre>
+<pre class="r"><code>TRUE | FALSE</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<p>Using this in an example with <code>filter()</code> to fetch all the flights to LAX in February:</p>
+<pre class="r"><code>filter(flights, dest == &quot;LAX&quot; &amp; month == 2)</code></pre>
+<pre><code>## # A tibble: 1,030 x 19
+##     year month   day dep_t… sched_… dep_d… arr_… sched… arr_d… carr… flig…
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;int&gt;  &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;int&gt;
+##  1  2013     2     1    554     601 - 7.00   920    918   2.00 UA     1030
+##  2  2013     2     1    654     700 - 6.00  1032   1034 - 2.00 DL      763
+##  3  2013     2     1    657     705 - 8.00  1027   1035 - 8.00 VX      399
+##  4  2013     2     1    658     700 - 2.00  1018   1027 - 9.00 B6      671
+##  5  2013     2     1    722     705  17.0   1040   1018  22.0  UA      298
+##  6  2013     2     1    807     730  37.0   1134   1100  34.0  AA       33
+##  7  2013     2     1    826     830 - 4.00  1206   1154  12.0  UA      112
+##  8  2013     2     1    857     900 - 3.00  1225   1227 - 2.00 DL      120
+##  9  2013     2     1    859     900 - 1.00  1251   1220  31.0  AA        1
+## 10  2013     2     1    901     905 - 4.00  1230   1235 - 5.00 VX      407
+## # ... with 1,020 more rows, and 8 more variables: tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
+<div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Filtering data</h3>
+</div>
+<div class="panel-body">
+<p>Let's do several more examples to make sure you're super comfortable with filtering data:</p>
+<ul>
+<li>How many flights left before 6 AM?</li>
+<li>How many flights went to Toronto (YYZ)? Is there anything weird about this dataset?</li>
+<li>What is a typical flight time (air time) when traveling from New York to Chicago O'Hare (ORD)?</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="using-the-pipe" class="section level2">
+<h2>Using the “pipe”</h2>
+<p>The tidyverse heavily encourages the use of a special pipe (<code>%&gt;%</code> operator). The pipe sends the output of the last command to the first argument of the next (probably will be a familiar concept for users of bash, the Linux shell). This is a great tool for making our analyses more readable (read: good).</p>
+<p>Repeating an earlier example, we can retrieve the number of flights that went to LAX with:</p>
+<pre class="r"><code># earlier example:
+# nrow(filter(flights, dest == &quot;LAX&quot;))
+
+flights %&gt;% filter(dest == &quot;LAX&quot;) %&gt;% nrow</code></pre>
+<pre><code>## [1] 16174</code></pre>
+<p>Our analysis now flows from left to right, instead of inside out. Makes things quite a bit more readable. Many people also put each step on a new line. That way if you want to exclude a step, you can just comment it out.</p>
+<pre class="r"><code>flights %&gt;%
+    filter(dest == &quot;LAX&quot;) %&gt;%
+    nrow()</code></pre>
+<pre><code>## [1] 16174</code></pre>
+</div>
+<div id="controlling-output" class="section level2">
+<h2>Controlling output</h2>
+<p><code>dplyr</code> also has its own function for selecting columns: <code>select()</code>. To grab the certain columns from a dataframe, we supply their names to <code>select()</code> as arguments.</p>
+<pre class="r"><code>flights %&gt;% select(flight, dest, air_time)</code></pre>
+<pre><code>## # A tibble: 336,776 x 3
+##    flight dest  air_time
+##     &lt;int&gt; &lt;chr&gt;    &lt;dbl&gt;
+##  1   1545 IAH      227  
+##  2   1714 IAH      227  
+##  3   1141 MIA      160  
+##  4    725 BQN      183  
+##  5    461 ATL      116  
+##  6   1696 ORD      150  
+##  7    507 FLL      158  
+##  8   5708 IAD       53.0
+##  9     79 MCO      140  
+## 10    301 ORD      138  
+## # ... with 336,766 more rows</code></pre>
+<p>We can also sort columns using <code>arrange()</code>. <code>arrange()</code> sorts a dataset by whatever column names you specify.</p>
+<pre class="r"><code>flights %&gt;% arrange(sched_dep_time)</code></pre>
+<pre><code>## # A tibble: 336,776 x 19
+##     year month   day dep_t… sched_… dep_d… arr_… sched… arr_d… carr… flig…
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;   &lt;int&gt;  &lt;dbl&gt; &lt;int&gt;  &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;int&gt;
+##  1  2013     7    27     NA     106  NA       NA    245  NA    US     1632
+##  2  2013     1     2    458     500 - 2.00   703    650  13.0  US     1030
+##  3  2013     1     3    458     500 - 2.00   650    650   0    US     1030
+##  4  2013     1     4    456     500 - 4.00   631    650 -19.0  US     1030
+##  5  2013     1     5    458     500 - 2.00   640    650 -10.0  US     1030
+##  6  2013     1     6    458     500 - 2.00   718    650  28.0  US     1030
+##  7  2013     1     7    454     500 - 6.00   637    648 -11.0  US     1117
+##  8  2013     1     8    454     500 - 6.00   625    648 -23.0  US     1117
+##  9  2013     1     9    457     500 - 3.00   647    648 - 1.00 US     1117
+## 10  2013     1    10    450     500 -10.0    634    648 -14.0  US     1117
+## # ... with 336,766 more rows, and 8 more variables: tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
+<p>To sort in descending order, we can add the <code>desc()</code> function into the mix.</p>
+<pre class="r"><code>flights %&gt;% arrange(desc(sched_dep_time))</code></pre>
+<pre><code>## # A tibble: 336,776 x 19
+##     year month   day dep_t… sched… dep_del… arr_… sche… arr_d… carr… flig…
+##    &lt;int&gt; &lt;int&gt; &lt;int&gt;  &lt;int&gt;  &lt;int&gt;    &lt;dbl&gt; &lt;int&gt; &lt;int&gt;  &lt;dbl&gt; &lt;chr&gt; &lt;int&gt;
+##  1  2013     1     1   2353   2359  -  6.00   425   445 - 20.0 B6      739
+##  2  2013     1     1   2353   2359  -  6.00   418   442 - 24.0 B6      707
+##  3  2013     1     1   2356   2359  -  3.00   425   437 - 12.0 B6      727
+##  4  2013     1     2     42   2359    43.0    518   442   36.0 B6      707
+##  5  2013     1     2   2351   2359  -  8.00   427   445 - 18.0 B6      739
+##  6  2013     1     2   2354   2359  -  5.00   413   437 - 24.0 B6      727
+##  7  2013     1     3     32   2359    33.0    504   442   22.0 B6      707
+##  8  2013     1     3    235   2359   156      700   437  143   B6      727
+##  9  2013     1     3   2349   2359  - 10.0    434   445 - 11.0 B6      739
+## 10  2013     1     4     25   2359    26.0    505   442   23.0 B6      707
+## # ... with 336,766 more rows, and 8 more variables: tailnum &lt;chr&gt;,
+## #   origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;, hour &lt;dbl&gt;,
+## #   minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
+</div>
+<div id="data-analysis" class="section level2">
+<h2>Data analysis</h2>
+<p>So far we’ve learned how to to rearrange and select parts of our data. What about actually analyzing it. The <code>group_by()</code> and <code>summarize()</code> functions, allow us to group by a certain column (say, city or airline), and then perform an operation on every group.</p>
+<p>A simple example might be grouping by month and then summarizing by the number of flights (rows) in each group.</p>
+<pre class="r"><code>flights %&gt;%
+    group_by(month) %&gt;%
+    summarize(length(month))  # number of records in a group</code></pre>
+<pre><code>## # A tibble: 12 x 2
+##    month `length(month)`
+##    &lt;int&gt;           &lt;int&gt;
+##  1     1           27004
+##  2     2           24951
+##  3     3           28834
+##  4     4           28330
+##  5     5           28796
+##  6     6           28243
+##  7     7           29425
+##  8     8           29327
+##  9     9           27574
+## 10    10           28889
+## 11    11           27268
+## 12    12           28135</code></pre>
+<p>We can also perform multiple “summarizations” at once and name our columns something informative.</p>
+<pre class="r"><code>flights %&gt;%
+    group_by(month) %&gt;%
+    summarize(num_flights=length(month),
+              avg_flight_time=mean(air_time, na.rm=TRUE))</code></pre>
+<pre><code>## # A tibble: 12 x 3
+##    month num_flights avg_flight_time
+##    &lt;int&gt;       &lt;int&gt;           &lt;dbl&gt;
+##  1     1       27004             154
+##  2     2       24951             151
+##  3     3       28834             149
+##  4     4       28330             153
+##  5     5       28796             146
+##  6     6       28243             150
+##  7     7       29425             147
+##  8     8       29327             148
+##  9     9       27574             143
+## 10    10       28889             149
+## 11    11       27268             155
+## 12    12       28135             163</code></pre>
+<p>We can also simply add on a column to a dataset with the <code>mutate()</code> function. This is the equivalent of <code>cats$age &lt;- c(1, 3, 4)</code> like we did earlier.</p>
+<pre class="r"><code>colnames(flights)</code></pre>
+<pre><code>##  [1] &quot;year&quot;           &quot;month&quot;          &quot;day&quot;            &quot;dep_time&quot;      
+##  [5] &quot;sched_dep_time&quot; &quot;dep_delay&quot;      &quot;arr_time&quot;       &quot;sched_arr_time&quot;
+##  [9] &quot;arr_delay&quot;      &quot;carrier&quot;        &quot;flight&quot;         &quot;tailnum&quot;       
+## [13] &quot;origin&quot;         &quot;dest&quot;           &quot;air_time&quot;       &quot;distance&quot;      
+## [17] &quot;hour&quot;           &quot;minute&quot;         &quot;time_hour&quot;</code></pre>
+<pre class="r"><code>new_flights &lt;- flights %&gt;%
+    mutate(plane_speed = distance / air_time)
+colnames(flights)</code></pre>
+<pre><code>##  [1] &quot;year&quot;           &quot;month&quot;          &quot;day&quot;            &quot;dep_time&quot;      
+##  [5] &quot;sched_dep_time&quot; &quot;dep_delay&quot;      &quot;arr_time&quot;       &quot;sched_arr_time&quot;
+##  [9] &quot;arr_delay&quot;      &quot;carrier&quot;        &quot;flight&quot;         &quot;tailnum&quot;       
+## [13] &quot;origin&quot;         &quot;dest&quot;           &quot;air_time&quot;       &quot;distance&quot;      
+## [17] &quot;hour&quot;           &quot;minute&quot;         &quot;time_hour&quot;</code></pre>
+<p><div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Finding the worst airline</h3>
+</div>
+<div class="panel-body">
+<p>Which airline has the worst record in terms of delays?</p>
+<p>To do this, group our data by carrier, 
+           get the average arrival delay for each group,
+           then sort in descending order so that the worst offenders are at the top.</p>
+</div>
+</div><div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Picking an analysis method</h3>
+</div>
+<div class="panel-body">
+<p>Get the maximum arrival delay in the dataset.
+            You'll want to use the `max()` function.
+            Did you need to use `dplyr`?</p>
+</div>
+</div></p>
+</div>
+<div id="putting-dataframes-together" class="section level2">
+<h2>Putting dataframes together</h2>
+<p>In terms of some data, the <code>flights</code> table is actually incomplete! What if we wanted to match up the destination airport acronyms to their details (like airports’ full names)? This data is actually in another table: <code>airports</code>.</p>
+<pre class="r"><code>head(airports)</code></pre>
+<pre><code>## # A tibble: 6 x 8
+##   faa   name                             lat   lon   alt    tz dst   tzone
+##   &lt;chr&gt; &lt;chr&gt;                          &lt;dbl&gt; &lt;dbl&gt; &lt;int&gt; &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;
+## 1 04G   Lansdowne Airport               41.1 -80.6  1044 -5.00 A     Amer…
+## 2 06A   Moton Field Municipal Airport   32.5 -85.7   264 -6.00 A     Amer…
+## 3 06C   Schaumburg Regional             42.0 -88.1   801 -6.00 A     Amer…
+## 4 06N   Randall Airport                 41.4 -74.4   523 -5.00 A     Amer…
+## 5 09J   Jekyll Island Airport           31.1 -81.4    11 -5.00 A     Amer…
+## 6 0A9   Elizabethton Municipal Airport  36.4 -82.2  1593 -5.00 A     Amer…</code></pre>
+<p>In order for this information to be useful to us, we need to match it up and “join” it to our flights table. This is a pretty complex operation in base R, but <code>dplyr</code> makes it relatively easy.</p>
+<p>There are a lot of different types of joins that put together data in different ways. In this case, we’re going to do what’s called a “left join”: one table is on the left side, and we’ll keep all of its data. However, on the right side (the table we are joining), we’ll only match up and add each entry if there is a corresponding entry on the left side.</p>
+<pre class="r"><code>colnames(flights)</code></pre>
+<pre><code>##  [1] &quot;year&quot;           &quot;month&quot;          &quot;day&quot;            &quot;dep_time&quot;      
+##  [5] &quot;sched_dep_time&quot; &quot;dep_delay&quot;      &quot;arr_time&quot;       &quot;sched_arr_time&quot;
+##  [9] &quot;arr_delay&quot;      &quot;carrier&quot;        &quot;flight&quot;         &quot;tailnum&quot;       
+## [13] &quot;origin&quot;         &quot;dest&quot;           &quot;air_time&quot;       &quot;distance&quot;      
+## [17] &quot;hour&quot;           &quot;minute&quot;         &quot;time_hour&quot;</code></pre>
+<pre class="r"><code>colnames(airports)</code></pre>
+<pre><code>## [1] &quot;faa&quot;   &quot;name&quot;  &quot;lat&quot;   &quot;lon&quot;   &quot;alt&quot;   &quot;tz&quot;    &quot;dst&quot;   &quot;tzone&quot;</code></pre>
+<pre class="r"><code># join syntax:
+# left_join(left_table, right_table, by=c(&quot;left_colname&quot; = &quot;right_colname&quot;))
+# the &quot;by&quot; argument controls which columns in each table are matched up
+joined &lt;- left_join(flights, airports, by=c(&quot;dest&quot; = &quot;faa&quot;))
+colnames(joined)  # joined now contain columns from both</code></pre>
+<pre><code>##  [1] &quot;year&quot;           &quot;month&quot;          &quot;day&quot;            &quot;dep_time&quot;      
+##  [5] &quot;sched_dep_time&quot; &quot;dep_delay&quot;      &quot;arr_time&quot;       &quot;sched_arr_time&quot;
+##  [9] &quot;arr_delay&quot;      &quot;carrier&quot;        &quot;flight&quot;         &quot;tailnum&quot;       
+## [13] &quot;origin&quot;         &quot;dest&quot;           &quot;air_time&quot;       &quot;distance&quot;      
+## [17] &quot;hour&quot;           &quot;minute&quot;         &quot;time_hour&quot;      &quot;name&quot;          
+## [21] &quot;lat&quot;            &quot;lon&quot;            &quot;alt&quot;            &quot;tz&quot;            
+## [25] &quot;dst&quot;            &quot;tzone&quot;</code></pre>
+<p>Let’s check our work. SEA should show up as Seattle-Tacoma International Airport. Note: we can use <code>.</code> as a placeholder to represent the entire object passed to the summarize function (instead of using just a column name, for instance).</p>
+<pre class="r"><code>joined %&gt;%
+    filter(dest == &quot;SEA&quot;) %&gt;%
+    select(name) %&gt;%
+    head(n=1)</code></pre>
+<pre><code>## # A tibble: 1 x 1
+##   name               
+##   &lt;chr&gt;              
+## 1 Seattle Tacoma Intl</code></pre>
+<p>Looks like our join worked!</p>
+<p><div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Worst airline, part II</h3>
+</div>
+<div class="panel-body">
+<p>Find the name of the airline with the biggest arrival delays.
+           You will need to join the `airlines` table to the `flights` table.
+           A suggested workflow is shown below (feel free to reuse code from earlier).</p>
+<ul>
+<li>Calculate the average arrival delays by airline.</li>
+<li>Sort the result by average delay in descending order.</li>
+<li>Find which columns match up between the `airlines` and `flights` tables.
+                Remember, you can use `print(table_name, width=Inf)` to show all columns!</li>
+<li>Join the `airlines` table to the `flights` table based upon their common column.</li>
+<li>The top value is your answer</li>
+</ul>
+</div>
+</div><div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Writing output</h3>
+</div>
+<div class="panel-body">
+<p>Write your results from the last problem to a file.
+         Use the `write_csv()` to write the table to a csv file.
+         You can use `?write_csv()` to look up how to use this function.</p>
+</div>
+</div></p>
+<a href="control.html" style="font-size:2em;">Next section</a>
+</div>
+
+<hr>
+<p text-align="right">&copy; Jeff Stafford // <a href="https://jstaf.github.io/r-data-science/">https://jstaf.github.io/r-data-science/</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title>Vectors and indexing</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Data Science with R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Sections
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="basics.html">Basic syntax</a>
+    </li>
+    <li>
+      <a href="vectors.html">Vectors and indexing</a>
+    </li>
+    <li>
+      <a href="dataframes.html">Dataframes</a>
+    </li>
+    <li>
+      <a href="dplyr.html">Data analysis with dplyr</a>
+    </li>
+    <li>
+      <a href="control.html">Writing functions</a>
+    </li>
+    <li>
+      <a href="ggplot2.html">Pretty plots with ggplot2</a>
+    </li>
+    <li>
+      <a href="rmarkdown.html">Reports with R Markdown</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Vectors and indexing</h1>
+
+</div>
+
+
+<div id="what-is-a-vector" class="section level2">
+<h2>What is a vector?</h2>
+<p>R has a special data structure called a vector. A vector is a 1D set of the same type of object. Most often, a vector will simply be a sequence of numbers. We can create a sequence of numbers using the <code>:</code> operator.</p>
+<pre class="r"><code>numbers &lt;- 1:10
+numbers</code></pre>
+<pre><code>##  [1]  1  2  3  4  5  6  7  8  9 10</code></pre>
+<p>Note that vectors are treated the same way as a single element. Anything that works on a single number works the same way on a vector. This is called vectorization.</p>
+<pre class="r"><code>numbers + 5</code></pre>
+<pre><code>##  [1]  6  7  8  9 10 11 12 13 14 15</code></pre>
+<pre class="r"><code>2 ^ numbers</code></pre>
+<pre><code>##  [1]    2    4    8   16   32   64  128  256  512 1024</code></pre>
+<pre class="r"><code>sin(numbers)</code></pre>
+<pre><code>##  [1]  0.8414710  0.9092974  0.1411200 -0.7568025 -0.9589243 -0.2794155
+##  [7]  0.6569866  0.9893582  0.4121185 -0.5440211</code></pre>
+<p>We can also create a vector with the <code>c()</code> function (<code>c</code> stands for concatenate, in case you are wondering).</p>
+<pre class="r"><code>concat &lt;- c(4, 17, -1, 55, 2)
+concat</code></pre>
+<pre><code>## [1]  4 17 -1 55  2</code></pre>
+</div>
+<div id="indexing" class="section level2">
+<h2>Indexing</h2>
+<p>Often, we don’t want to get the entire vector. Perhaps we only want a single element, or a set of specific elements. We do this by indexing (uses the <code>[]</code> brackets).</p>
+<p>To get the first element of a vector, we could do the following. In R, array indexes start at 1 - the 1st element is at index 1. This is different than 0-based languages like C, Python, or Java where the first element is at index 0.</p>
+<pre class="r"><code>concat[1]</code></pre>
+<pre><code>## [1] 4</code></pre>
+<p>To get other elements, we could do the following:</p>
+<pre class="r"><code>concat[2]  # second element</code></pre>
+<pre><code>## [1] 17</code></pre>
+<pre class="r"><code>concat[length(concat)]  # last element</code></pre>
+<pre><code>## [1] 2</code></pre>
+<p>Notice that for the second example, we put a function inside the square brackets. In this case, <code>length()</code> is used to get the length of a vector, and since the lenght of the vector will be equal to the index of its last element, this is a nifty way of getting the last element of a vector.</p>
+<p>We can actually put anything inside the square brackets. Putting another vector inside the brackets gives us multiple values, for instance.</p>
+<pre class="r"><code>concat[1:4]</code></pre>
+<pre><code>## [1]  4 17 -1 55</code></pre>
+<pre class="r"><code>concat[c(3, 5)]</code></pre>
+<pre><code>## [1] -1  2</code></pre>
+<p>We can use this technique to reassign certain values inside the vector. For instance, we could change the 3rd and 5th values to 76 with the following code:</p>
+<pre class="r"><code>concat[c(3, 5)] &lt;- 76
+concat</code></pre>
+<pre><code>## [1]  4 17 76 55 76</code></pre>
+<p>It’s even possible to index outside the bounds of a vector. Notice that R “fills in the blanks” with <code>NA</code> values. <code>NA</code> is R’s placeholder for “no data” (since 0 often shows up in real data).</p>
+<pre class="r"><code>concat[10] &lt;- 4.3
+concat</code></pre>
+<pre><code>##  [1]  4.0 17.0 76.0 55.0 76.0   NA   NA   NA   NA  4.3</code></pre>
+<p><strong>DON’T EVER DO THIS.</strong> Though this is actually valid code in R (indexing outside of a vector’s size is an error in most other languages), it comes at a significant performance cost.</p>
+</div>
+<div id="matrices" class="section level2">
+<h2>Matrices</h2>
+<p>A matrix is a two-dimensional vector. Let’s create a matrix with the <code>matrix()</code> function. One important note here: functions often have optional, “extra” arguments that are specified with <code>name=value</code> notation. In this case, we are creating a matrix with 2 rows and 5 columns.</p>
+<pre class="r"><code>mat &lt;- matrix(1:10, nrow=2, ncol=5)
+mat</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5]
+## [1,]    1    3    5    7    9
+## [2,]    2    4    6    8   10</code></pre>
+<p>All of the same operations that work on vectors also work on matrices.</p>
+<pre class="r"><code>mat + 20</code></pre>
+<pre><code>##      [,1] [,2] [,3] [,4] [,5]
+## [1,]   21   23   25   27   29
+## [2,]   22   24   26   28   30</code></pre>
+<pre class="r"><code>dim(mat)  # grab dimensions of a matrix</code></pre>
+<pre><code>## [1] 2 5</code></pre>
+<pre class="r"><code>length(mat)  # number of elements in a matrix</code></pre>
+<pre><code>## [1] 10</code></pre>
+<p>However, indexing a matrix is slightly different from indexing in a vector. We now have not only one, but two dimensions to choose from. When indexing using an object with multiple dimensions, we use a <code>,</code> to separate them. In R, rows are on the left side of the comma, and columns are on the right (a third dimension would be after the second comma, and so on…). Note that R is actually trying to help us out here. When we printed our matrix, the rows have a <code>[#,]</code> next to them, and the columns have a <code>[,#]</code>. This actually shows us the exact syntax we need to get each element.</p>
+<p>So using the matrix output from above, <code>mat[1,]</code> should give us the first row, and <code>mat[,4]</code> should give us the fourth column. Let’s check this:</p>
+<pre class="r"><code>mat[1,]</code></pre>
+<pre><code>## [1] 1 3 5 7 9</code></pre>
+<pre class="r"><code>mat[,4]</code></pre>
+<pre><code>## [1] 7 8</code></pre>
+<p>We can index both rows and columns at the same time to get a specific element.</p>
+<pre class="r"><code>mat[1, 1]  # grab first row, first column</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>mat[2, 1:3]  # elements 1-3 of the second row</code></pre>
+<pre><code>## [1] 2 4 6</code></pre>
+<p><div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Grabbing unrelated elements</h3>
+</div>
+<div class="panel-body">
+<p>Try getting the columns 1, 4, and 5 of the first row in one command.</p>
+</div>
+</div><div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Reading documentation</h3>
+</div>
+<div class="panel-body">
+<p>Create an 8x5 matrix using the numbers 1:40. 
+      See if you can get it to fill by row instead of by column.</p>
+<p>Hint: you should check the documentation for matrix().</p>
+</div>
+</div></p>
+</div>
+<div id="different-types-of-data" class="section level2">
+<h2>Different types of data</h2>
+<p>In most programming languages, text is called a string. To create text in R, we simply surround it with double (<code>&quot;</code>) or single (<code>'</code>) quotes. We’ve actually seen an example of a string already (<code>print('hello world!')</code>).</p>
+<pre class="r"><code>&quot;this is a string&quot;</code></pre>
+<pre><code>## [1] &quot;this is a string&quot;</code></pre>
+<pre class="r"><code>paste(&#39;we can combine strings&#39;, &#39;with the paste() function&#39;)</code></pre>
+<pre><code>## [1] &quot;we can combine strings with the paste() function&quot;</code></pre>
+<p>What happens when we add a string to a vector of numbers?</p>
+<pre class="r"><code>numbers &lt;- c(1, 4, 9, 10)
+numbers</code></pre>
+<pre><code>## [1]  1  4  9 10</code></pre>
+<pre class="r"><code>numbers[3] &lt;- &quot;testing...&quot;
+numbers</code></pre>
+<pre><code>## [1] &quot;1&quot;          &quot;4&quot;          &quot;testing...&quot; &quot;10&quot;</code></pre>
+<p>Our entire vector of numbers was turned into strings! This is an important property of vectors and matrices: they can only hold one type of data! If we try putting a different type into a vector, R will convert the entire vector to the new datatype.</p>
+<p>Again, this conversion has a massive performance hit, especially for a large vector or matrix. R needs to create an entire new vector from scratch, and then copy over and convert every item.</p>
+<p>So let’s learn about R’s different data types. There are a few more types that we’re not covering here or cover later (like factors, for instance). These are simply the most common data types we will encounter.</p>
+<div id="numeric" class="section level3">
+<h3>Numeric</h3>
+<p>Numeric variables can hold any decimal number, positive or negative. In other languages these are called floats. Note that this is the default type of number in R.</p>
+<p>To create a numeric value, all we have to do is type it normally.</p>
+<pre class="r"><code>1</code></pre>
+<pre><code>## [1] 1</code></pre>
+<pre class="r"><code>-3.5</code></pre>
+<pre><code>## [1] -3.5</code></pre>
+<p>We can convert another variable to numeric with the <code>as.numeric()</code> function. This only works with values that can be easily converted.</p>
+<pre class="r"><code>as.numeric(&quot;456&quot;)  # this works</code></pre>
+<pre><code>## [1] 456</code></pre>
+<pre class="r"><code>as.numeric(&quot;seven&quot;)  # this does not</code></pre>
+<pre><code>## Warning: NAs introduced by coercion</code></pre>
+<pre><code>## [1] NA</code></pre>
+</div>
+<div id="integers" class="section level3">
+<h3>Integers</h3>
+<p>Integers represent any whole number, positive or negative. They cannot hold decimal numbers.</p>
+<p>To create a number explicitly as an integer, add an <code>L</code> after it.</p>
+<pre class="r"><code>15L</code></pre>
+<pre><code>## [1] 15</code></pre>
+<p>We can convert a set of data to integer with the <code>as.integer()</code> function.</p>
+<pre class="r"><code>as.integer(c(&quot;65.3&quot;, &quot;4&quot;))</code></pre>
+<pre><code>## [1] 65  4</code></pre>
+</div>
+<div id="characters-strings" class="section level3">
+<h3>Characters (strings)</h3>
+<p>As mentioned earlier, strings are sets of text. We can turn something into a string with the <code>as.character()</code> function.</p>
+<pre class="r"><code>as.character(TRUE)</code></pre>
+<pre><code>## [1] &quot;TRUE&quot;</code></pre>
+</div>
+<div id="logical-boolean-values" class="section level3">
+<h3>Logical (boolean) values</h3>
+<p>There are just two logical values: <code>TRUE</code> and <code>FALSE</code>. These are used, quite literally, to represent whether or not a statement is true or false.</p>
+<p>As usual, we can turn something into a logical/boolean value with the <code>as.logical()</code> function. One important thing to note is that this very nicely demonstrates what happens when we turn one data type into another. If one data type cannot hold extra information from another, that information is lost during conversion.</p>
+<pre class="r"><code>fifty &lt;- as.logical(50)
+fifty</code></pre>
+<pre><code>## [1] TRUE</code></pre>
+<pre class="r"><code>as.numeric(fifty)</code></pre>
+<pre><code>## [1] 1</code></pre>
+</div>
+<div id="determining-data-types" class="section level3">
+<h3>Determining data types</h3>
+<p>If something isn’t working the way it’s supposed to, a great technique is to check what type of data it is with the <code>class()</code> function:</p>
+<pre class="r"><code>class(14)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>class(1L)</code></pre>
+<pre><code>## [1] &quot;integer&quot;</code></pre>
+<pre class="r"><code>class(TRUE)</code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<pre class="r"><code>class(&quot;text&quot;)</code></pre>
+<pre><code>## [1] &quot;character&quot;</code></pre>
+<pre class="r"><code>class(NA)  </code></pre>
+<pre><code>## [1] &quot;logical&quot;</code></pre>
+<p>Note that <code>NA</code>’s can be of any type, and are often used as placeholders for missing data.</p>
+<pre class="r"><code>exercise(&quot;Converting data types&quot;,
+         p(&#39;See if you can make the following expressions work:&#39;),
+         p(&#39;5 + &quot;10&quot; - Get 15 as a result.&#39;),
+         p(&#39;3 + 3.7 - Get 6 as a result.&#39;),
+         p(&#39;1 + 1 - Your answer should equal &quot;11&quot;.&#39;),
+         p(&#39;&quot;4&quot; + 10` - Get 5 as a result.&#39;)
+)</code></pre>
+<div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Converting data types</h3>
+</div>
+<div class="panel-body">
+<p>See if you can make the following expressions work:</p>
+<p>5 + "10" - Get 15 as a result.</p>
+<p>3 + 3.7 - Get 6 as a result.</p>
+<p>1 + 1 - Your answer should equal "11".</p>
+<p>"4" + 10` - Get 5 as a result.</p>
+</div>
+</div>
+<a href="dataframes.html" style="font-size:2em;">Next section</a>
+</div>
+</div>
+
+<hr>
+<p text-align="right">&copy; Jeff Stafford // <a href="https://jstaf.github.io/r-data-science/">https://jstaf.github.io/r-data-science/</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

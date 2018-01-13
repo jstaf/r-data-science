@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+
+<title></title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/flatly.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+
+</head>
+
+<body>
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 60px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+
+.section h2 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h3 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h4 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h5 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+.section h6 {
+  padding-top: 65px;
+  margin-top: -65px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+
+<div class="container-fluid main-container">
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+
+
+
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row-fluid">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Data Science with R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Sections
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="basics.html">Basic syntax</a>
+    </li>
+    <li>
+      <a href="vectors.html">Vectors and indexing</a>
+    </li>
+    <li>
+      <a href="dataframes.html">Dataframes</a>
+    </li>
+    <li>
+      <a href="dplyr.html">Data analysis with dplyr</a>
+    </li>
+    <li>
+      <a href="control.html">Writing functions</a>
+    </li>
+    <li>
+      <a href="ggplot2.html">Pretty plots with ggplot2</a>
+    </li>
+    <li>
+      <a href="rmarkdown.html">Reports with R Markdown</a>
+    </li>
+  </ul>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+
+</div>
+
+
+<div id="reports-with-r-markdown" class="section level1">
+<h1>Reports with R Markdown</h1>
+<p>Making plots and being able to write output files is important. However, the most important part of any analysis is communicating your findings effectively! The <code>rmarkdown</code> package is one of the best and easiest ways of doing this. It let’s you create a fancy looking report without ever leaving RStudio. You can interleave your code and plots together with explanation text and formatting you might normally do in a tool like Microsoft Word. You can even make websites with it (like this one!)!</p>
+<p>Let’s get started with R Markdown and make ourselves a sweet report.</p>
+</div>
+<div id="creating-an-r-markdown-notebook" class="section level1">
+<h1>Creating an R Markdown notebook</h1>
+<p>In RStudio, go to File -&gt; New File -&gt; R Markdown. It will ask you what you want to call the file - leave the output as HTML for now.</p>
+<p>You should see a file open with a lot of text and code already there. This is the default R Markdown document and comes with a lot of pointers about how to do things. For now, save the file as <code>example.Rmd</code>, and hit the “Knit” button.</p>
+<p>If everything went well, you should see a nicely formatted webpage/ report pop up in RStudio’s built-in browser. Congratulations, you’ve made your first report!</p>
+</div>
+<div id="basic-formatting" class="section level1">
+<h1>Basic formatting</h1>
+<p>Now that we know everything’s working, let’s start from scratch and learn how R Markdown works step-by-step. The first thing we should do is delete everything except for the following:</p>
+<pre><code>---
+title: &quot;test&quot;
+author: &quot;Jeff Stafford&quot;
+date: &quot;August 20, 2017&quot;
+output: html_document
+---</code></pre>
+<p>The stuff between the <code>---</code>s is called YAML - it’s a markup format that describes what kind of document to make, who wrote it, and other technical bits that’s not actual content in your report. If you want, you can modify it, but let’s leave it be for now.</p>
+<p>At the bottom of the document, let’s start typing some text. Everything that follows is example markdown output and syntax:</p>
+<p>Normal characters result in normal text.</p>
+<p><em> *this makes italics* </em></p>
+<p><strong> **big bad bold text** </strong></p>
+<p><strong><em> ***italic AND bold*** </em></strong></p>
+</div>
+<div id="a-header" class="section level1">
+<h1># A header</h1>
+<div id="a-smaller-header" class="section level2">
+<h2>## A smaller header</h2>
+<div id="an-even-smaller-header" class="section level3">
+<h3>### An even smaller header</h3>
+<p>Horizontal lines can be made with lots of dashes. Like this:</p>
+<p>----------------------</p>
+<hr />
+<p>To start a list, we can use asterisks:</p>
+<ul>
+<li>* Item one</li>
+<li>* Item two</li>
+<li>* Item three
+<ul>
+<li>indenting four spaces makes a nested list</li>
+</ul></li>
+</ul>
+<p>We can make a numbered list by just typing 1. 2. 3.</p>
+<ol style="list-style-type: decimal">
+<li>first</li>
+<li>second</li>
+<li>third</li>
+</ol>
+<p>To make a block of code-y looking text, we use backticks:</p>
+<p>`<code>some code</code>`</p>
+<p>```</p>
+<pre><code>Three backticks makes
+a block of text 
+look the same way.</code></pre>
+<p>```</p>
+<p>A hyperlink looks like <code>[link text](www.some-website.ca)</code></p>
+<p>Images are just a link with an <code>!</code> in front:</p>
+<p><code>![image text](www.some-image-site/image.png)</code></p>
+<div class="panel panel-primary">
+<div class="panel-heading">
+<h3 class="panel-title">Some notes on formatting</h3>
+</div>
+<div class="panel-body">
+<p>Text on subsequent lines gets treated as the same line. 
+       To have text appear in a separate line/paragraph, 
+       you need a blank line in between.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="including-code-data-and-plots" class="section level1">
+<h1>Including code, data, and plots</h1>
+<p>To include code in a report, we just change the “code” styling slightly. Add a <code>{r}</code> after the triple backticks to have that block of text get treated as R code. The top of the code header should look like this: <code>```{r}</code></p>
+<p>In practice, it looks something like this:</p>
+<pre class="r"><code>5 + 6</code></pre>
+<pre><code>## [1] 11</code></pre>
+<pre class="r"><code>print(&quot;The code output gets put directly below&quot;)</code></pre>
+<pre><code>## [1] &quot;The code output gets put directly below&quot;</code></pre>
+<p>If you want to display data, you have a couple options. The first, is just to print out data the way you normally would.</p>
+<pre class="r"><code>library(gapminder)
+head(gapminder)</code></pre>
+<pre><code>## # A tibble: 6 x 6
+##   country     continent  year lifeExp      pop gdpPercap
+##   &lt;fctr&gt;      &lt;fctr&gt;    &lt;int&gt;   &lt;dbl&gt;    &lt;int&gt;     &lt;dbl&gt;
+## 1 Afghanistan Asia       1952    28.8  8425333       779
+## 2 Afghanistan Asia       1957    30.3  9240934       821
+## 3 Afghanistan Asia       1962    32.0 10267083       853
+## 4 Afghanistan Asia       1967    34.0 11537966       836
+## 5 Afghanistan Asia       1972    36.1 13079460       740
+## 6 Afghanistan Asia       1977    38.4 14880372       786</code></pre>
+<p>However, there is a special function <code>knitr::kable()</code> that inserts a nice-looking table into your report. Depending on what your output format is, it sometimes is even interactive!</p>
+<pre class="r"><code>knitr::kable(head(gapminder))</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">country</th>
+<th align="left">continent</th>
+<th align="right">year</th>
+<th align="right">lifeExp</th>
+<th align="right">pop</th>
+<th align="right">gdpPercap</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Afghanistan</td>
+<td align="left">Asia</td>
+<td align="right">1952</td>
+<td align="right">28.801</td>
+<td align="right">8425333</td>
+<td align="right">779.4453</td>
+</tr>
+<tr class="even">
+<td align="left">Afghanistan</td>
+<td align="left">Asia</td>
+<td align="right">1957</td>
+<td align="right">30.332</td>
+<td align="right">9240934</td>
+<td align="right">820.8530</td>
+</tr>
+<tr class="odd">
+<td align="left">Afghanistan</td>
+<td align="left">Asia</td>
+<td align="right">1962</td>
+<td align="right">31.997</td>
+<td align="right">10267083</td>
+<td align="right">853.1007</td>
+</tr>
+<tr class="even">
+<td align="left">Afghanistan</td>
+<td align="left">Asia</td>
+<td align="right">1967</td>
+<td align="right">34.020</td>
+<td align="right">11537966</td>
+<td align="right">836.1971</td>
+</tr>
+<tr class="odd">
+<td align="left">Afghanistan</td>
+<td align="left">Asia</td>
+<td align="right">1972</td>
+<td align="right">36.088</td>
+<td align="right">13079460</td>
+<td align="right">739.9811</td>
+</tr>
+<tr class="even">
+<td align="left">Afghanistan</td>
+<td align="left">Asia</td>
+<td align="right">1977</td>
+<td align="right">38.438</td>
+<td align="right">14880372</td>
+<td align="right">786.1134</td>
+</tr>
+</tbody>
+</table>
+<p>You can put code inline in text by just typing “r some code” in backtics.</p>
+<p>Plots are done the same way as code:</p>
+<pre class="r"><code>library(ggplot2)
+ggplot(gapminder, aes(x=year, y=lifeExp, group=year)) +
+    geom_boxplot()</code></pre>
+<p><img src="rmarkdown_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p>You can use R markdown to create HTML reports, Word documents, PDFs, and even websites. For instance, this entire lesson website was created using R markdown.</p>
+<div class="panel panel-danger">
+<div class="panel-heading">
+<h3 class="panel-title">Exercise - Writing your own report</h3>
+</div>
+<div class="panel-body">
+<p>Using any dataset you want, find something interesting and 
+           write a report on it in RMarkdown
+           (nycflights13) is a good starting point.</p>
+</div>
+</div>
+<a href="index.html" style="font-size:2em;">Return to frontpage</a>
+</div>
+
+<hr>
+<p text-align="right">&copy; Jeff Stafford // <a href="https://jstaf.github.io/r-data-science/">https://jstaf.github.io/r-data-science/</a></p>
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
