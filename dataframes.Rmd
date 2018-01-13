@@ -1,11 +1,10 @@
 ---
+title: Dataframes
 ---
 
 ```{r, echo=FALSE}
 source("includes.R")
 ```
-
-## Vectors vs. Dataframes
 
 Vectors and matrices are super cool. 
 However they don't address an important issue:

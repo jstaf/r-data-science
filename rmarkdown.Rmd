@@ -1,7 +1,7 @@
 ---
+title: Reports with R Markdown
 ---
 
-# Reports with R Markdown
 
 ```{r, include=FALSE}
 source("includes.R")
